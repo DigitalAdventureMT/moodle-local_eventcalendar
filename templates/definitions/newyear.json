@@ -1,0 +1,12 @@
+{
+    "template_key": "newyear",
+    "name": "Calendario di Capodanno",
+    "category": "civil",
+    "days_count": 24,
+    "date_rule": {
+        "type": "fixed",
+        "month": 1,
+        "day": 1
+    },
+    "progressive_unlock_default": true
+}

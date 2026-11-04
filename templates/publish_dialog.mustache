@@ -1,0 +1,116 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_eventcalendar/publish_dialog
+
+    Dialog with the options to publish a calendar. Each option shows a preview on top and the button
+    to copy its code (or its image, for the QR code) below. Opened from the calendar management page
+    by the local_eventcalendar/publish_dialog module.
+
+    A native HTML dialog element is used: opened with showModal() it is a modal dialog with focus
+    management and Escape key support in every Moodle version, without depending on the core modal
+    API, which changed between Moodle 4.1 and 5.x. The dialog has no padding and the content is in an
+    inner element, so that a click on the dialog element itself is a click on the backdrop.
+
+    The options are a carousel that follows the WAI-ARIA carousel pattern: no automatic rotation,
+    previous and next buttons, a status text announced to screen readers and one group per option
+    ("slide"). The JavaScript shows up to three options at a time and hides the others with the hidden
+    attribute; without JavaScript all options are visible. The previews are inert: they show the result
+    but their links cannot be followed or focused. The image copy button copies the image of the preview
+    of its option, so the data URI of the QR code is not repeated in the page. The optional link of an
+    option (theme settings) opens in a new window, so that the dialog stays available; its icon tells
+    it to screen reader users too.
+
+    Context variables required for this template:
+    * id - Unique id of the dialog
+    * title - Dialog title
+    * snippets - Options, each with key, title, description, slidelabel, preview, and code (text to copy)
+      or image and filename (image to copy), and an optional link with url and label
+
+    Example context (json):
+    {
+        "id": "local-eventcalendar-publish-1",
+        "title": "Publish the calendar: Advent",
+        "snippets": [
+            {"key": "link", "title": "Link", "description": "A text link.", "slidelabel": "1 of 2",
+             "preview": "<a href=\"#\">Advent</a>", "code": "<a href=\"#\">Advent</a>"},
+            {"key": "menu", "title": "Theme menu item", "description": "A line for the menu.", "slidelabel": "2 of 2",
+             "preview": "<code>Advent|/local/eventcalendar/view.php?id=1</code>",
+             "code": "Advent|/local/eventcalendar/view.php?id=1",
+             "link": {"url": "#", "label": "Open the menu settings"}
+            }
+        ]
+    }
+}}
+<dialog id="{{id}}" class="local-eventcalendar-publish" aria-labelledby="{{id}}-title">
+<div class="local-eventcalendar-publish-body">
+    <div class="d-flex align-items-start mb-2">
+        <h2 id="{{id}}-title" class="h4 mb-0">{{title}}</h2>
+        <button type="button" class="btn btn-link p-0 local-eventcalendar-push-end" data-action="local-eventcalendar-publish-close"
+                title="{{#str}}closebuttontitle, core{{/str}}">
+            {{#pix}}e/cancel, core, {{#str}}closebuttontitle, core{{/str}}{{/pix}}
+        </button>
+    </div>
+    <p class="text-muted">{{#str}}publishintro, local_eventcalendar{{/str}}</p>
+    <div class="local-eventcalendar-publish-carousel" role="region" aria-roledescription="{{#str}}publishcarousel, local_eventcalendar{{/str}}"
+            aria-label="{{#str}}publishoptions, local_eventcalendar{{/str}}" data-region="carousel">
+        <div class="d-flex align-items-center justify-content-between mb-2 local-eventcalendar-gap-sm">
+            <button type="button" class="btn btn-secondary" data-action="local-eventcalendar-publish-previous"
+                    aria-controls="{{id}}-options" hidden>
+                <span aria-hidden="true">&lsaquo;</span> {{#str}}publishprevious, local_eventcalendar{{/str}}
+            </button>
+            <span data-region="carousel-status" aria-live="polite"></span>
+            <button type="button" class="btn btn-secondary" data-action="local-eventcalendar-publish-next"
+                    aria-controls="{{id}}-options" hidden>
+                {{#str}}publishnext, local_eventcalendar{{/str}} <span aria-hidden="true">&rsaquo;</span>
+            </button>
+        </div>
+        <div id="{{id}}-options" class="local-eventcalendar-publish-options" data-region="options">
+            {{#snippets}}
+            <div class="local-eventcalendar-publish-option card" role="group" aria-roledescription="{{#str}}publishslide, local_eventcalendar{{/str}}"
+                    aria-labelledby="{{id}}-{{key}}" aria-describedby="{{id}}-{{key}}-position" data-region="slide">
+                <div class="card-body d-flex flex-column">
+                    <h3 id="{{id}}-{{key}}" class="h6 mb-1">{{title}}</h3>
+                    <span id="{{id}}-{{key}}-position" class="accesshide">{{slidelabel}}</span>
+                    <p class="small text-muted">{{description}}</p>
+                    <div class="local-eventcalendar-publish-preview mb-3" inert>
+                        {{#image}}<img src="{{image}}" alt="" class="local-eventcalendar-publish-qrcode">{{/image}}
+                        {{^image}}{{{preview}}}{{/image}}
+                    </div>
+                    {{#code}}
+                    <button type="button" class="btn btn-secondary mt-auto" data-action="local-eventcalendar-publish-copy"
+                            data-code="{{code}}">{{#str}}copycode, local_eventcalendar{{/str}}</button>
+                    {{/code}}
+                    {{#image}}
+                    <button type="button" class="btn btn-secondary mt-auto" data-action="local-eventcalendar-publish-copy-image">
+                        {{#str}}copyimage, local_eventcalendar{{/str}}
+                    </button>
+                    <a href="{{image}}" download="{{filename}}" class="mt-2 small text-center">{{#str}}downloadimage, local_eventcalendar{{/str}}</a>
+                    {{/image}}
+                    {{#link}}
+                    <a href="{{url}}" class="mt-2 small text-center" target="_blank" rel="noopener">
+                        {{label}} {{#pix}}i/externallink, core, {{#str}}opensinnewwindow, core{{/str}}{{/pix}}
+                    </a>
+                    {{/link}}
+                </div>
+            </div>
+            {{/snippets}}
+        </div>
+    </div>
+    <span class="accesshide" role="status" data-region="status"></span>
+</div>
+</dialog>

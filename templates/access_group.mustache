@@ -1,0 +1,49 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_eventcalendar/access_group
+
+    Block of access conditions (a card) in the accessrules.php page, rendered by the
+    local_eventcalendar/access_rules module.
+
+    Blocks are combined with OR and the conditions of a block with AND; the separators are written by
+    JavaScript, so the card has no title.
+
+    The X button removes the block with all its conditions. The add button is always the last element of
+    the card; conditions are inserted in the "rules" region above it.
+
+    The spacing classes come from the plugin styles.css, the same in Bootstrap 4 and 5. The card is a
+    group for assistive technologies; its accessible name (with the position) is set by the JavaScript.
+
+    Example context (json):
+    {
+    }
+}}
+<div class="card mb-2" data-region="group" role="group">
+    <div class="card-body d-flex align-items-start local-eventcalendar-gap-sm">
+        <div class="flex-grow-1">
+            <div data-region="rules"></div>
+            <button type="button" class="btn btn-secondary" data-action="add-rule">
+                {{#str}}accessaddrule, local_eventcalendar{{/str}}
+            </button>
+        </div>
+        <button type="button" class="btn btn-link text-danger p-0 local-eventcalendar-push-end" data-action="remove-group"
+                title="{{#str}}accessremovegroup, local_eventcalendar{{/str}}">
+            {{#pix}}e/cancel, core, {{#str}}accessremovegroup, local_eventcalendar{{/str}}{{/pix}}
+        </button>
+    </div>
+</div>

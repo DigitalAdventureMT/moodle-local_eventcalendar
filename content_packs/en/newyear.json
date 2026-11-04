@@ -1,0 +1,102 @@
+{
+    "language": "en",
+    "template_key": "newyear",
+    "version": 1,
+    "tagline": "Click on the boxes as they unlock day by day: the countdown to the new year has begun!",
+    "subjects": [
+        "{{name}} – the countdown continues! 🎉",
+        "{{name}} – the countdown continues! ✨",
+        "{{name}} – a new box to open! 🥂",
+        "{{name}} – a new box to open! 🎆",
+        "{{name}} – today's surprise is waiting for you! 🎊",
+        "{{name}} – today's surprise is waiting for you! ⏳",
+        "{{name}} – one day less to the new year! 🎉",
+        "{{name}} – one day less to the new year! ✨",
+        "{{name}} – find out what's here today! 🥂",
+        "{{name}} – find out what's here today! 🎆",
+        "{{name}} – the new year is getting closer! 🎊",
+        "{{name}} – the new year is getting closer! ⏳",
+        "{{name}} – new box available! 🎉",
+        "{{name}} – new box available! ✨",
+        "{{name}} – a new idea to say goodbye to the year! 🥂",
+        "{{name}} – a new idea to say goodbye to the year! 🎆",
+        "{{name}} – want to discover today's box? 🎊",
+        "{{name}} – want to discover today's box? ⏳",
+        "{{name}} – there's something for you today! 🎉",
+        "{{name}} – there's something for you today! ✨",
+        "{{name}} – fewer and fewer days to go! 🥂",
+        "{{name}} – fewer and fewer days to go! 🎆",
+        "{{name}} – time to open today's box! 🎊",
+        "{{name}} – time to open today's box! ⏳"
+    ],
+    "notifications": [
+        "<p>The countdown to the new year continues: there's a new box to open today!</p><p>Discover what it holds.</p>",
+        "<p>Curious to find out what's waiting for you today in the New Year calendar?</p><p>Open it now!</p>",
+        "<p>One day less to the new year and a new surprise to discover.</p><p>Click to see it.</p>",
+        "<p>Today's box is ready for you.</p><p>Don't keep it waiting!</p>",
+        "<p>The year is almost over and the calendar still has many ideas to say goodbye to it in style.</p><p>Discover today's one.</p>",
+        "<p>Today, too, the New Year calendar has something for you.</p><p>Come and see!</p>",
+        "<p>The new year is getting closer: open today's box and get inspired.</p><p>Click now.</p>",
+        "<p>A new day, a new box: the countdown goes on.</p><p>Discover it now!</p>",
+        "<p>Good morning! Today's surprise is already waiting.</p><p>Have a look.</p>",
+        "<p>Fewer and fewer days to the midnight toast.</p><p>Open today's box!</p>",
+        "<p>Would you like to find out what the New Year calendar has in store for you today?</p><p>Just one click.</p>",
+        "<p>The surprises keep coming: today's box is waiting just for you.</p><p>Open it now!</p>",
+        "<p>Another step towards the new year: see what's in the calendar today.</p><p>Find out now.</p>",
+        "<p>The countdown doesn't stop: there's a new box for you today.</p><p>Come and discover it!</p>"
+    ],
+    "daycontents": [
+        "<p>Another day, another box: the new year is getting closer and closer!</p>",
+        "<p>Think back to a beautiful moment of this year and to the people who made it special.</p>",
+        "<p>It's a good time to write down a small wish for the year to come.</p>",
+        "<p>December is a month for looking back: what have you learned this year?</p>",
+        "<p>A greeting to someone you haven't heard from in a while can make a difference.</p>",
+        "<p>Festive lights brighten up the streets: enjoy the atmosphere of these days.</p>",
+        "<p>Think of a goal you reached this year, even a small one: you deserved it.</p>",
+        "<p>The countdown continues: every box you open is a step towards the new year.</p>",
+        "<p>Today, try to let go of something you don't want to take with you into the new year.</p>",
+        "<p>A resolution works better when it's simple and concrete: what could yours be?</p>",
+        "<p>The holidays are the right time to be with the people you care about.</p>",
+        "<p>Think back to a challenge you overcame this year: you are stronger than you think.</p>",
+        "<p>Allow yourself a break: rest is also a great way to end the year.</p>",
+        "<p>What would you like to do for the first time in the new year?</p>",
+        "<p>A sincere thank you is the best way to say goodbye to the year that is ending.</p>",
+        "<p>Have you already thought about how to celebrate the new year?</p>",
+        "<p>Every ending is also a new beginning: enjoy these last days of the year.</p>",
+        "<p>Try sorting through this year's photos and memories: you'll find some wonderful ones.</p>",
+        "<p>The new year is a blank page: what would you like to write on it?</p>",
+        "<p>A small act of kindness today is a great way to get ready for the new year.</p>",
+        "<p>Every box is a small end-of-year gift: keep up the countdown!</p>",
+        "<p>Day by day, the midnight toast is getting closer.</p>"
+    ],
+    "restday_daycontents": [
+        "<p>Today is a day of rest: enjoy it, the countdown starts again tomorrow.</p>",
+        "<p>A break in the countdown: relax and spend time with the people you love.</p>",
+        "<p>No box to discover today: allow yourself a quiet day.</p>",
+        "<p>Even the wait for the new year needs a break. See you tomorrow!</p>",
+        "<p>A day of rest: recharge your energy for the celebrations ahead.</p>",
+        "<p>Today we slow down. The surprises start again tomorrow!</p>"
+    ],
+    "daycontent_first": [
+        "<p>The countdown has begun! Every day a new box will accompany you until the first day of the new year.</p>"
+    ],
+    "daycontent_last": [
+        "<p>Happy New Year! The countdown is over: may the new year bring you serenity, health and many reasons to be happy. Best wishes to you and your loved ones!</p>"
+    ],
+    "ctas": [
+        "Discover today's box",
+        "Continue the countdown",
+        "Go to today's surprise",
+        "Open the box",
+        "Find out what awaits you",
+        "Continue towards the new year",
+        "See today's surprise",
+        "Find out more",
+        "Go on",
+        "Keep counting down"
+    ],
+    "cta_first": [
+        "Start the countdown"
+    ],
+    "cta_last": []
+}

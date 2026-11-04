@@ -1,0 +1,14 @@
+{
+    "banners": [
+        {"filename": "Banner01.png", "name": "Banner advent 01"},
+        {"filename": "Banner02.png", "name": "Banner advent 02"},
+        {"filename": "Banner03.png", "name": "Banner halloween 01"},
+        {"filename": "Banner04.png", "name": "Banner halloween 02"},
+        {"filename": "Banner05.png", "name": "Banner lent 01"},
+        {"filename": "Banner06.png", "name": "Banner lent 02"},
+        {"filename": "Banner07.png", "name": "Banner chinese new year 01"},
+        {"filename": "Banner08.png", "name": "Banner chinese new year 02"},
+        {"filename": "Banner09.png", "name": "Banner new year 01"},
+        {"filename": "Banner10.png", "name": "Banner new year 02"}
+    ]
+}

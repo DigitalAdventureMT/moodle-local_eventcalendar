@@ -1,0 +1,102 @@
+{
+    "language": "it",
+    "template_key": "newyear",
+    "version": 1,
+    "tagline": "Fai click sulle caselle che si attivano giorno dopo giorno: il conto alla rovescia verso il nuovo anno è iniziato!",
+    "subjects": [
+        "{{name}} – il conto alla rovescia continua! 🎉",
+        "{{name}} – il conto alla rovescia continua! ✨",
+        "{{name}} – una nuova casella da aprire! 🥂",
+        "{{name}} – una nuova casella da aprire! 🎆",
+        "{{name}} – la sorpresa di oggi ti aspetta! 🎊",
+        "{{name}} – la sorpresa di oggi ti aspetta! ⏳",
+        "{{name}} – un giorno in meno al nuovo anno! 🎉",
+        "{{name}} – un giorno in meno al nuovo anno! ✨",
+        "{{name}} – scopri cosa c'è oggi! 🥂",
+        "{{name}} – scopri cosa c'è oggi! 🎆",
+        "{{name}} – il nuovo anno si avvicina! 🎊",
+        "{{name}} – il nuovo anno si avvicina! ⏳",
+        "{{name}} – nuova casella disponibile! 🎉",
+        "{{name}} – nuova casella disponibile! ✨",
+        "{{name}} – un nuovo spunto per salutare l'anno! 🥂",
+        "{{name}} – un nuovo spunto per salutare l'anno! 🎆",
+        "{{name}} – vuoi scoprire la casella di oggi? 🎊",
+        "{{name}} – vuoi scoprire la casella di oggi? ⏳",
+        "{{name}} – oggi c'è qualcosa per te! 🎉",
+        "{{name}} – oggi c'è qualcosa per te! ✨",
+        "{{name}} – mancano sempre meno giorni! 🥂",
+        "{{name}} – mancano sempre meno giorni! 🎆",
+        "{{name}} – è il momento di aprire la casella di oggi! 🎊",
+        "{{name}} – è il momento di aprire la casella di oggi! ⏳"
+    ],
+    "notifications": [
+        "<p>Il conto alla rovescia verso il nuovo anno continua: oggi c'è una nuova casella da aprire!</p><p>Scopri cosa contiene.</p>",
+        "<p>Curioso di sapere cosa ti aspetta oggi nel Calendario di Capodanno?</p><p>Aprilo subito!</p>",
+        "<p>Un giorno in meno al nuovo anno e una nuova sorpresa da scoprire.</p><p>Clicca per vederla.</p>",
+        "<p>La casella di oggi è pronta per te.</p><p>Non farla aspettare!</p>",
+        "<p>L'anno sta per finire e il calendario ha ancora tante idee per salutarlo al meglio.</p><p>Scopri quella di oggi.</p>",
+        "<p>Anche oggi il Calendario di Capodanno ha qualcosa per te.</p><p>Vieni a vedere!</p>",
+        "<p>Il nuovo anno si avvicina: apri la casella di oggi e lasciati ispirare.</p><p>Clicca ora.</p>",
+        "<p>Una nuova giornata, una nuova casella: il conto alla rovescia prosegue.</p><p>Scoprila subito!</p>",
+        "<p>Buongiorno! La sorpresa di oggi è già pronta.</p><p>Dai un'occhiata.</p>",
+        "<p>Mancano sempre meno giorni al brindisi di mezzanotte.</p><p>Apri la casella di oggi!</p>",
+        "<p>Ti va di scoprire cosa riserva oggi il Calendario di Capodanno?</p><p>Basta un clic.</p>",
+        "<p>Le sorprese continuano: la casella di oggi aspetta solo te.</p><p>Aprila ora!</p>",
+        "<p>Un altro passo verso il nuovo anno: guarda cosa c'è oggi nel calendario.</p><p>Scoprilo subito.</p>",
+        "<p>Il conto alla rovescia non si ferma: oggi c'è una nuova casella per te.</p><p>Vieni a scoprirla!</p>"
+    ],
+    "daycontents": [
+        "<p>Un altro giorno, un'altra casella: il nuovo anno è sempre più vicino!</p>",
+        "<p>Prova a ripensare a un momento bello di quest'anno e a chi lo ha reso speciale.</p>",
+        "<p>È un buon momento per scrivere un piccolo desiderio per l'anno che verrà.</p>",
+        "<p>Dicembre è il mese dei bilanci: cosa hai imparato quest'anno?</p>",
+        "<p>Un messaggio di auguri a qualcuno che non senti da tempo può fare la differenza.</p>",
+        "<p>Le luci delle feste illuminano le città: goditi l'atmosfera di questi giorni.</p>",
+        "<p>Pensa a un obiettivo raggiunto quest'anno, anche piccolo: te lo sei meritato.</p>",
+        "<p>Il conto alla rovescia continua: ogni casella aperta è un passo verso il nuovo anno.</p>",
+        "<p>Oggi prova a lasciare andare una cosa che non vuoi portare con te nell'anno nuovo.</p>",
+        "<p>Un buon proposito funziona meglio se è semplice e concreto: quale potrebbe essere il tuo?</p>",
+        "<p>Le feste sono il momento giusto per stare con le persone a cui tieni.</p>",
+        "<p>Ripensa a una sfida che hai superato quest'anno: sei più forte di quanto pensi.</p>",
+        "<p>Concediti una pausa: anche il riposo è un ottimo modo per chiudere l'anno.</p>",
+        "<p>Cosa vorresti fare per la prima volta nel nuovo anno?</p>",
+        "<p>Un grazie sincero è il modo migliore per salutare l'anno che se ne va.</p>",
+        "<p>Hai già pensato a come festeggiare l'arrivo del nuovo anno?</p>",
+        "<p>Ogni fine è anche un nuovo inizio: goditi questi ultimi giorni dell'anno.</p>",
+        "<p>Prova a fare ordine tra foto e ricordi di quest'anno: ne troverai di bellissimi.</p>",
+        "<p>Il nuovo anno è una pagina bianca: cosa ti piacerebbe scriverci sopra?</p>",
+        "<p>Un piccolo gesto gentile oggi è un ottimo modo per prepararsi al nuovo anno.</p>",
+        "<p>Ogni casella è un piccolo regalo di fine anno: continua il conto alla rovescia!</p>",
+        "<p>Giorno dopo giorno, il brindisi di mezzanotte si avvicina.</p>"
+    ],
+    "restday_daycontents": [
+        "<p>Oggi è giorno di riposo: goditi la giornata, domani il conto alla rovescia riparte.</p>",
+        "<p>Una pausa nel conto alla rovescia: rilassati e stai con chi ami.</p>",
+        "<p>Oggi niente casella da scoprire: concediti una giornata tranquilla.</p>",
+        "<p>Anche l'attesa del nuovo anno ha bisogno di una pausa. A domani!</p>",
+        "<p>Giorno di riposo: ricarica le energie per le feste che arrivano.</p>",
+        "<p>Oggi si rallenta. Le sorprese riprendono domani!</p>"
+    ],
+    "daycontent_first": [
+        "<p>Il conto alla rovescia è iniziato! Ogni giorno una nuova casella ti accompagnerà fino al primo giorno del nuovo anno.</p>"
+    ],
+    "daycontent_last": [
+        "<p>Buon anno! Il conto alla rovescia è finito: che il nuovo anno ti porti serenità, salute e tante occasioni per essere felice. Auguri a te e a chi ti è caro!</p>"
+    ],
+    "ctas": [
+        "Scopri la casella di oggi",
+        "Continua il conto alla rovescia",
+        "Vai alla sorpresa di oggi",
+        "Apri la casella",
+        "Scopri cosa ti aspetta",
+        "Continua verso il nuovo anno",
+        "Guarda la sorpresa di oggi",
+        "Scopri di più",
+        "Vai avanti",
+        "Prosegui il conto alla rovescia"
+    ],
+    "cta_first": [
+        "Inizia il conto alla rovescia"
+    ],
+    "cta_last": []
+}

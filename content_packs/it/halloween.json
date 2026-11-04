@@ -1,0 +1,73 @@
+{
+    "language": "it",
+    "template_key": "halloween",
+    "version": 1,
+    "tagline": "Fai click sulle caselle che si attivano giorno dopo giorno... se hai il coraggio di aprirle!",
+    "subjects": [
+        "{{name}} – una nuova casella misteriosa ti aspetta! 🎃",
+        "{{name}} – una nuova casella misteriosa ti aspetta! 👻",
+        "{{name}} – hai il coraggio di aprire la casella di oggi? 🦇",
+        "{{name}} – hai il coraggio di aprire la casella di oggi? 🕸️",
+        "{{name}} – dolcetto o scherzetto? Scoprilo oggi! 🍬",
+        "{{name}} – dolcetto o scherzetto? Scoprilo oggi! 🎃",
+        "{{name}} – qualcosa si nasconde nella casella di oggi... 👻",
+        "{{name}} – qualcosa si nasconde nella casella di oggi... 🦇",
+        "{{name}} – la notte delle streghe si avvicina! 🕸️",
+        "{{name}} – la notte delle streghe si avvicina! 🌕",
+        "{{name}} – nuova sorpresa da brivido disponibile! 🎃",
+        "{{name}} – nuova sorpresa da brivido disponibile! 🍬",
+        "{{name}} – il conto alla rovescia più spaventoso continua! 👻"
+    ],
+    "notifications": [
+        "<p>Una nuova casella misteriosa ti aspetta nel Calendario di Halloween.</p><p>Hai il coraggio di aprirla?</p>",
+        "<p>Dolcetto o scherzetto? La risposta è nella casella di oggi!</p><p>Clicca per scoprirla.</p>",
+        "<p>Qualcosa di misterioso si nasconde nel calendario di oggi...</p><p>Vieni a vedere, se osi!</p>",
+        "<p>La notte di Halloween si avvicina e le sorprese da brivido non mancano.</p><p>Apri la casella di oggi!</p>",
+        "<p>Zucche, pipistrelli e ragnatele: la casella di oggi è pronta.</p><p>Scoprila subito!</p>",
+        "<p>Il conto alla rovescia più spaventoso dell'anno continua.</p><p>Guarda cosa c'è oggi!</p>",
+        "<p>Anche oggi il Calendario di Halloween ha preparato qualcosa per te.</p><p>Aprilo, se hai coraggio!</p>",
+        "<p>Un'altra casella da brivido ti aspetta.</p><p>Clicca per aprirla.</p>",
+        "<p>La luna è alta e la casella di oggi è pronta ad essere aperta.</p><p>Scopri cosa nasconde!</p>",
+        "<p>Manca sempre meno alla notte delle streghe: non perderti la sorpresa di oggi.</p><p>Aprila ora!</p>"
+    ],
+    "daycontents": [
+        "<p>Un'altra casella, un'altra sorpresa da brivido!</p>",
+        "<p>Hai già scelto il costume per la notte di Halloween?</p>",
+        "<p>Le zucche intagliate illuminano le finestre: la notte delle streghe è vicina.</p>",
+        "<p>Una storia di fantasmi raccontata al buio è sempre un'ottima idea in questi giorni.</p>",
+        "<p>Pipistrelli, ragnatele e candele: l'atmosfera di Halloween è sempre più intensa.</p>",
+        "<p>Prepara una scorta di dolcetti: nessuno vuole subire uno scherzetto!</p>",
+        "<p>Oggi la casella nasconde un piccolo mistero... riuscirai a scoprirlo?</p>",
+        "<p>Le giornate si accorciano e le ombre si allungano: Halloween è alle porte.</p>",
+        "<p>Un film di paura sul divano, una coperta e qualche dolcetto: la serata perfetta.</p>",
+        "<p>Il conto alla rovescia più spaventoso dell'anno continua: non tremare!</p>",
+        "<p>Le streghe stanno preparando le loro pozioni per la grande notte.</p>",
+        "<p>Ogni casella aperta ti avvicina alla luna di Halloween.</p>"
+    ],
+    "restday_daycontents": [
+        "<p>Oggi anche i fantasmi si riposano. Le sorprese da brivido riprendono domani!</p>",
+        "<p>Giorno di riposo: goditi la giornata, il calendario ti aspetta domani.</p>",
+        "<p>Una pausa nel conto alla rovescia: ricarica le energie per la notte delle streghe.</p>",
+        "<p>Oggi niente brividi: concediti una giornata tranquilla.</p>"
+    ],
+    "daycontent_first": [
+        "<p>Il conto alla rovescia verso Halloween è iniziato! Ogni giorno una nuova casella misteriosa ti aspetta fino alla notte delle streghe.</p>"
+    ],
+    "daycontent_last": [
+        "<p>È la notte di Halloween! Il conto alla rovescia è finito: buon divertimento tra zucche, costumi e dolcetti. Felice Halloween!</p>"
+    ],
+    "ctas": [
+        "Apri la casella di oggi",
+        "Scopri la sorpresa di oggi",
+        "Continua, se hai coraggio",
+        "Scopri cosa si nasconde",
+        "Dolcetto o scherzetto?",
+        "Vai avanti",
+        "Scopri di più",
+        "Continua il conto alla rovescia"
+    ],
+    "cta_first": [
+        "Inizia il conto alla rovescia"
+    ],
+    "cta_last": []
+}

@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/eventcalendar/db" VERSION="20261023" COMMENT="Database schema of local_eventcalendar."
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+  <TABLES>
+
+    <!-- Calendars -->
+    <TABLE NAME="local_eventcalendar_calendar" COMMENT="Calendar instances. Each row is an independently configurable calendar, created from a template or manually.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Display name of the calendar."/>
+        <FIELD NAME="templatekey" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Key of the source template (templates/definitions/*.json). Null for calendars created in custom mode."/>
+        <FIELD NAME="language" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Language of the calendar: code of one of the languages of the content packs (content_packs/{language}/). Together with templatekey it identifies the content pack that supplies the tagline and the day contents (and the texts that other plugins read from it). Null means no content pack is used."/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Introductory text shown on the list and detail pages."/>
+        <FIELD NAME="tagline" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Short text shown under the banner in the calendar grid, for example a call to action. Null or empty means no text. Separate from intro, which is a longer descriptive text."/>
+        <FIELD NAME="restdayenabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Weekly rest day enabled (1) or not (0). When enabled, days falling on the weekday set in restdayweekday use the rest texts of the content pack for the page content instead of the generic ones. Notifications are not affected."/>
+        <FIELD NAME="restdayweekday" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Weekday of the rest day, as in PHP date('w'): 0 = Sunday ... 6 = Saturday. Computed on the UTC date of the day. Only effective if restdayenabled = 1."/>
+        <FIELD NAME="startdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of the start of the countdown."/>
+        <FIELD NAME="enddate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of the last content day."/>
+        <FIELD NAME="enddisplaydate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Automatic hiding date: upper limit of the activation window. Always set. For calendars created from a template it defaults to enddate plus 20 days."/>
+        <FIELD NAME="progressiveunlock" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Progressive unlock flag: 1 = enabled, 0 = all days are always reachable."/>
+        <FIELD NAME="iconsetid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Icon set used by the calendar."/>
+        <FIELD NAME="notificationsetid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Notification set associated with the calendar. Null means no notifications configured."/>
+        <FIELD NAME="forcehide" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Manual override: 1 = always hidden regardless of the dates, 0 = follows the automatic activation from startdate to enddisplaydate. A copy or an imported calendar made by other plugins starts with forcehide = 1."/>
+        <FIELD NAME="bannerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Preloaded banner chosen for the {{banner}} placeholder of the email template. Null means no preloaded banner: other plugins can then provide an image (image_url hook)."/>
+        <FIELD NAME="headerfooterid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Preloaded header and footer pair chosen for the day content template ({{header}} and {{footer}} placeholders). Null means no preloaded pair: no header and footer, unless other plugins provide the images (image_url hook)."/>
+        <FIELD NAME="emailtemplateid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Email template used for the notification emails of this calendar. Null, or a template that no longer exists, means the default email template."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record. Tracked separately because core\persistent only requires usermodified."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Mandatory property of core\persistent."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="forcehide" UNIQUE="false" FIELDS="forcehide" COMMENT="Speeds up the filter of active calendars in the site-wide list."/>
+        <INDEX NAME="iconsetid" UNIQUE="false" FIELDS="iconsetid" COMMENT="Calendars using an icon set (integrity checks before deletion)."/>
+        <INDEX NAME="notificationsetid" UNIQUE="false" FIELDS="notificationsetid" COMMENT="Calendars using a notification set."/>
+        <INDEX NAME="emailtemplateid" UNIQUE="false" FIELDS="emailtemplateid" COMMENT="Calendars using an email template."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Preloaded banners -->
+    <TABLE NAME="local_eventcalendar_banner" COMMENT="Banners shipped with the plugin (pix/banners/{identifier}.{ext} and {identifier}.json), offered in the calendar form.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="File name without extension in pix/banners/, also used to make the scan idempotent."/>
+        <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Full file name, with extension, in pix/banners/."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="identifier" UNIQUE="true" FIELDS="identifier"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Preloaded header and footer pairs -->
+    <TABLE NAME="local_eventcalendar_headfoot" COMMENT="Header and footer pairs shipped with the plugin (pix/headerfooters/ and headerfooters.json), offered in the calendar form for the day content template.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="File name of the header without extension, used to make the scan idempotent. Internal key, not a displayed label."/>
+        <FIELD NAME="headerfilename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Full file name, with extension, of the header in pix/headerfooters/."/>
+        <FIELD NAME="footerfilename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Full file name, with extension, of the footer in pix/headerfooters/."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="identifier" UNIQUE="true" FIELDS="identifier"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Days -->
+    <TABLE NAME="local_eventcalendar_days" COMMENT="Days of a calendar, merged with the day content: one row per day.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="calendarid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Calendar the day belongs to."/>
+        <FIELD NAME="daynumber" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Sequential number of the day (for example 1 to 24 for Advent). Also sets the display order."/>
+        <FIELD NAME="opendate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unlock timestamp of the day, used both for the icon state and for the progressive unlock."/>
+        <FIELD NAME="notiftitle" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Notification title for this day (plain text), copied from the title pool of the notification set when the calendar is generated. Detached from the set. Null if no set was selected or if it was cleared manually."/>
+        <FIELD NAME="notifbody" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Notification body for this day (HTML), copied from the body pool of the notification set. Images included in the body are not duplicated as files of this day, so the copied text may contain URLs pointing to files of the original notification set."/>
+        <FIELD NAME="notifbodyformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Format of notifbody, Moodle FORMAT_* constants."/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="HTML content shown on the day detail page, editable with the HTML editor. Copied from the content pack when the calendar is generated, if available; otherwise empty."/>
+        <FIELD NAME="contentformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Format of content, Moodle FORMAT_* constants."/>
+        <FIELD NAME="isready" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether the calendar manager considers this day ready (1) or still in progress (0, default). Only an indication: it does not block publishing or sending notifications."/>
+        <FIELD NAME="notes" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Free notes for the calendar manager (plain text), never shown to end users."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Mandatory property of core\persistent."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="calendarid_daynumber" UNIQUE="true" FIELDS="calendarid, daynumber" COMMENT="A calendar cannot have two days with the same day number."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Icon sets -->
+    <TABLE NAME="local_eventcalendar_icons" COMMENT="Icon sets.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="standard" SEQUENCE="false" COMMENT="Allowed values: standard, custom."/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="For source = standard: folder name in pix/iconsets/. For source = custom: internal slug; custom sets are managed by other plugins, which keep their files."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="source_identifier" UNIQUE="true" FIELDS="source, identifier" COMMENT="Prevents duplicates of the same standard or custom icon set."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Single icons -->
+    <TABLE NAME="local_eventcalendar_iconitem" COMMENT="Single icon inside a set.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="iconsetid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Icon set the icon belongs to."/>
+        <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Image file name: for source = custom it is the name of the uploaded file, for source = standard it is the file name in pix/iconsets/{identifier}/."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="iconsetid" UNIQUE="false" FIELDS="iconsetid" COMMENT="Icons of a set."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Email templates -->
+    <TABLE NAME="local_eventcalendar_emailtpl" COMMENT="Email format: fixed HTML wrapper (header, button, footer) with placeholders such as {{content}}, into which the notification content is inserted when sending.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false" COMMENT="Language code (for example it, en), matching the subfolder name in email_templates/."/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="File name without extension in email_templates/{language}/, used to make the scan idempotent."/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="HTML of the template, with placeholders {{content}}, {{firstname}}, {{calendarname}}, {{daynumber}}, {{linkurl}}, {{sitename}}, {{siteurl}}, {{logo}}, {{banner}}, {{year}}. The scan never overwrites it once the row exists."/>
+        <FIELD NAME="isdefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Fallback template when none exists for the recipient language. Only one record can have it set to 1."/>
+        <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="file" SEQUENCE="false" COMMENT="Origin of the template: file = imported by the scan of email_templates/ with its content unchanged; custom = created or changed by other means (copy, content edited, imported with a calendar)."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="language_identifier" UNIQUE="true" FIELDS="language, identifier" COMMENT="Avoids importing the same source file twice."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Day opening log -->
+    <TABLE NAME="local_eventcalendar_log" COMMENT="Log of day openings, used for the visited state and for reporting.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="calendarid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="dayid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeopened" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="dayid_userid" UNIQUE="false" FIELDS="dayid, userid" COMMENT="Frequent query: does a log exist for this user on this day (icon state)."/>
+        <INDEX NAME="calendarid" UNIQUE="false" FIELDS="calendarid" COMMENT="Openings of a calendar (reports)."/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="Openings of a user (privacy)."/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_eventcalendar_sent" COMMENT="Day notifications handled by the sending task (classes/task/send_notifications.php): one row per day and user, so that the same notification is not sent twice.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="calendarid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="dayid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timesent" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time of sending; null if the notification was not sent."/>
+        <FIELD NAME="attempts" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Sending attempts. With timesent null: 0 = skipped (invalid email address), 1 = failed once, retried by the next run, 2 = failed twice, not retried."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="dayid_userid" UNIQUE="true" FIELDS="dayid, userid" COMMENT="One notification per day and per person."/>
+        <INDEX NAME="calendarid" UNIQUE="false" FIELDS="calendarid" COMMENT="Notifications of a calendar."/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="Notifications of a user (privacy)."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Notifications -->
+    <TABLE NAME="local_eventcalendar_notif" COMMENT="Notifications: a collection of contents belonging to a set, split into two independent pools by kind (titles and bodies), not paired.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="setid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Notification set the notification belongs to."/>
+        <FIELD NAME="kind" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="body" SEQUENCE="false" COMMENT="'title' (title for Moodle messaging or email subject, plain text) or 'body' (message body, HTML with images). Independent pools within the same set."/>
+        <FIELD NAME="defaultmessage" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Content: plain title if kind = title, HTML (possibly with images) if kind = body. For email sending, image URLs in the body must be regenerated with a per-user token (moodle_url::make_pluginfile_url with includetoken = true) to be reachable without login."/>
+        <FIELD NAME="defaultmessageformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Format of the content, Moodle FORMAT_* constants. Relevant only for kind = body (titles are always plain text)."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="setid_kind" UNIQUE="false" FIELDS="setid, kind" COMMENT="Speeds up the separate retrieval of the two pools (titles and bodies) of a set."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Notification sets -->
+    <TABLE NAME="local_eventcalendar_notifset" COMMENT="Notification sets: containers of notifications of their own.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="sourcepack" TYPE="char" LENGTH="150" NOTNULL="false" SEQUENCE="false" COMMENT="Key of the standard content pack the set was imported from (format 'language:template_key', for example 'it:advent'). Null for sets created from scratch. Used only for idempotence: avoids offering an already imported pack again."/>
+        <FIELD NAME="sourcepackversion" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Pack version at import time (field 'version' in the JSON, default 1 if missing). Compared with the current version on disk to detect updated packs. Null if sourcepack is null."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Subscriptions -->
+    <TABLE NAME="local_eventcalendar_subscr" COMMENT="User subscriptions to the notifications of a calendar.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="calendarid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timesubscribed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="calendarid_userid" UNIQUE="true" FIELDS="calendarid, userid" COMMENT="A missing record means unsubscribed; one record per calendar and user pair."/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="Subscriptions of a user (privacy)."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Date lookup -->
+    <TABLE NAME="local_eventcalendar_datelook" COMMENT="Single lookup table for lunar and lunisolar dates, shared by all templates.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="templatekey" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Key of the template the date refers to (for example chinese_newyear)."/>
+        <FIELD NAME="eventyear" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Calendar year the resolved date refers to."/>
+        <FIELD NAME="eventdate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of the date resolved for that year and template."/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who created the record (see local_eventcalendar_calendar)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="templatekey_eventyear" UNIQUE="true" FIELDS="templatekey, eventyear" COMMENT="One date per template and year."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Access condition blocks -->
+    <TABLE NAME="local_eventcalendar_rulegrp" COMMENT="Blocks of access conditions of a calendar.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="calendarid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Calendar the block applies to."/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Display order in the rules page. Does not affect the evaluation (OR)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="calendarid" UNIQUE="false" FIELDS="calendarid" COMMENT="Blocks of conditions of a calendar."/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Single access condition -->
+    <TABLE NAME="local_eventcalendar_rule" COMMENT="Single access condition inside a block.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Block the condition belongs to."/>
+        <FIELD NAME="calendarid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Redundant with the block: allows reading all the conditions of a calendar with a single query."/>
+        <FIELD NAME="ruletype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Condition type: role and cohort in this plugin, or a type registered by another plugin."/>
+        <FIELD NAME="subject" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Item the condition refers to, as text, interpreted by the type (for example the id of a role or of a cohort)."/>
+        <FIELD NAME="comparison" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false" COMMENT="Comparison operator (is, isnot, equals, contains, before...). The field is not named operator to avoid SQL reserved words."/>
+        <FIELD NAME="value" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Value to compare, only for the types and operators that need it. Dates in YYYY-MM-DD format."/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Display order in the block. Does not affect the evaluation (AND)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ruletype_subject" UNIQUE="false" FIELDS="ruletype, subject" COMMENT="Finds the conditions referring to a given item (for example a deleted cohort)."/>
+        <INDEX NAME="groupid" UNIQUE="false" FIELDS="groupid" COMMENT="Conditions of a block."/>
+        <INDEX NAME="calendarid" UNIQUE="false" FIELDS="calendarid" COMMENT="Conditions of a calendar."/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+</XMLDB>

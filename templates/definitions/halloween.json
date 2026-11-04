@@ -1,0 +1,12 @@
+{
+    "template_key": "halloween",
+    "name": "Calendario di Halloween",
+    "category": "western_civil",
+    "days_count": 13,
+    "date_rule": {
+        "type": "fixed",
+        "month": 10,
+        "day": 31
+    },
+    "progressive_unlock_default": true
+}

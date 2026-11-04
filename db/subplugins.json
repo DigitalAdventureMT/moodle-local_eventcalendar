@@ -1,0 +1,10 @@
+{
+    "plugintypes": {
+        "ecaddon": "local/eventcalendar/addon",
+        "ecpack": "local/eventcalendar/pack"
+    },
+    "subplugintypes": {
+        "ecaddon": "addon",
+        "ecpack": "pack"
+    }
+}

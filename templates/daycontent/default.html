@@ -1,0 +1,31 @@
+<!--
+  Fixed day content template for the whole site, read from file on each use
+  (not imported into the database).
+
+  Placeholders, written here without the double braces: the whole file goes
+  through the replacement, so a placeholder in this comment would be replaced
+  too and the values would appear a second time in the page source.
+  - header     complete header image block of the calendar (empty if none)
+  - content    day content (already formatted HTML)
+  - ctabutton  complete call to action button (text and link), empty if the
+               day has no call to action or link
+  - footer     same as header, for the footer
+
+  No tables, unlike the email template: the page lives inside Moodle, so plain
+  HTML with a maximum width container is enough. The alt and role attributes of
+  the header and footer images are set by the code that generates the img tag,
+  not here.
+-->
+<div class="local-eventcalendar-daycontent" style="max-width: 700px; margin: 0 auto;">
+
+  {{header}}
+
+  <div style="margin: 24px 0; line-height: 1.6;">
+    {{content}}
+  </div>
+
+  {{ctabutton}}
+
+  {{footer}}
+
+</div>

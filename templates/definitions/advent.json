@@ -1,0 +1,12 @@
+{
+    "template_key": "advent",
+    "name": "Calendario dell'Avvento",
+    "category": "christian",
+    "days_count": 25,
+    "date_rule": {
+        "type": "fixed",
+        "month": 12,
+        "day": 25
+    },
+    "progressive_unlock_default": true
+}

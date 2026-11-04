@@ -1,0 +1,77 @@
+{
+    "language": "it",
+    "template_key": "chinese_newyear",
+    "version": 1,
+    "tagline": "Fai click sulle caselle che si attivano giorno dopo giorno: il conto alla rovescia verso il Capodanno cinese è iniziato!",
+    "subjects": [
+        "{{name}} – una nuova casella ti aspetta! 🏮",
+        "{{name}} – una nuova casella ti aspetta! 🧧",
+        "{{name}} – il conto alla rovescia continua! 🐉",
+        "{{name}} – il conto alla rovescia continua! 🎆",
+        "{{name}} – scopri la sorpresa di oggi! 🏮",
+        "{{name}} – scopri la sorpresa di oggi! 🥟",
+        "{{name}} – il Capodanno cinese si avvicina! 🧧",
+        "{{name}} – il Capodanno cinese si avvicina! 🐉",
+        "{{name}} – nuova casella disponibile! 🎆",
+        "{{name}} – nuova casella disponibile! 🏮",
+        "{{name}} – oggi c'è qualcosa di speciale per te! 🥟",
+        "{{name}} – oggi c'è qualcosa di speciale per te! 🧧",
+        "{{name}} – mancano sempre meno giorni! 🐉",
+        "{{name}} – mancano sempre meno giorni! 🎆",
+        "{{name}} – è il momento di aprire la casella di oggi! 🏮"
+    ],
+    "notifications": [
+        "<p>Il conto alla rovescia verso il Capodanno cinese continua: oggi c'è una nuova casella da aprire!</p><p>Scopri cosa contiene.</p>",
+        "<p>Curioso di sapere cosa ti aspetta oggi nel Calendario del Capodanno cinese?</p><p>Aprilo subito!</p>",
+        "<p>Lanterne rosse e buon auspicio: la casella di oggi è pronta per te.</p><p>Clicca per scoprirla.</p>",
+        "<p>Un giorno in meno alla festa di primavera e una nuova sorpresa da scoprire.</p><p>Vieni a vederla!</p>",
+        "<p>Anche oggi il calendario ha preparato qualcosa per te.</p><p>Apri la casella di oggi.</p>",
+        "<p>Il nuovo anno lunare si avvicina: guarda cosa c'è oggi nel calendario.</p><p>Scoprilo ora!</p>",
+        "<p>Buongiorno! La sorpresa di oggi ti aspetta.</p><p>Dai un'occhiata.</p>",
+        "<p>Una nuova casella, una nuova tradizione da scoprire.</p><p>Clicca per aprirla.</p>",
+        "<p>Mancano sempre meno giorni ai festeggiamenti.</p><p>Non perderti la casella di oggi!</p>",
+        "<p>Le sorprese continuano: la casella di oggi aspetta solo te.</p><p>Aprila ora!</p>"
+    ],
+    "daycontents": [
+        "<p>Un altro giorno, un'altra casella: il nuovo anno lunare è sempre più vicino!</p>",
+        "<p>Il Capodanno cinese è chiamato anche festa di primavera: segna il passaggio verso una nuova stagione.</p>",
+        "<p>Prima della festa è tradizione pulire la casa, per lasciare spazio alla fortuna dell'anno nuovo.</p>",
+        "<p>Il rosso è il colore della festa: porta fortuna e allontana le cattive influenze.</p>",
+        "<p>Le lanterne rosse decorano strade e case nei giorni che precedono il nuovo anno.</p>",
+        "<p>Le buste rosse con un piccolo dono sono uno dei gesti più tipici della festa.</p>",
+        "<p>I ravioli, simbolo di prosperità, sono tra i piatti più amati delle feste.</p>",
+        "<p>Ogni anno è associato a uno dei dodici animali dello zodiaco cinese: conosci il tuo?</p>",
+        "<p>Le strisce di carta rossa con auguri scritti a mano decorano le porte delle case.</p>",
+        "<p>La cena della vigilia riunisce tutta la famiglia: è il momento più atteso della festa.</p>",
+        "<p>Fuochi d'artificio e tamburi annunciano l'arrivo del nuovo anno.</p>",
+        "<p>La danza del leone e quella del drago portano allegria e buon auspicio nelle strade.</p>",
+        "<p>Un augurio sincero a qualcuno a cui tieni è il modo migliore per prepararsi al nuovo anno.</p>",
+        "<p>Il nuovo anno lunare si avvicina: continua il conto alla rovescia!</p>"
+    ],
+    "restday_daycontents": [
+        "<p>Oggi è giorno di riposo: goditi la giornata, domani il conto alla rovescia riparte.</p>",
+        "<p>Una pausa nel conto alla rovescia: rilassati e stai con chi ami.</p>",
+        "<p>Oggi niente casella da scoprire: concediti una giornata tranquilla.</p>",
+        "<p>Giorno di riposo: ricarica le energie per i festeggiamenti che arrivano.</p>"
+    ],
+    "daycontent_first": [
+        "<p>Il conto alla rovescia è iniziato! Ogni giorno una nuova casella ti accompagnerà fino al primo giorno del nuovo anno lunare.</p>"
+    ],
+    "daycontent_last": [
+        "<p>Buon anno! Il nuovo anno lunare è arrivato: che ti porti salute, serenità e prosperità. Auguri a te e a chi ti è caro!</p>"
+    ],
+    "ctas": [
+        "Scopri la casella di oggi",
+        "Continua il conto alla rovescia",
+        "Vai alla sorpresa di oggi",
+        "Apri la casella",
+        "Scopri la tradizione di oggi",
+        "Scopri di più",
+        "Vai avanti",
+        "Continua verso il nuovo anno"
+    ],
+    "cta_first": [
+        "Inizia il conto alla rovescia"
+    ],
+    "cta_last": []
+}

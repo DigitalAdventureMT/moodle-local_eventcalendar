@@ -1,0 +1,9 @@
+{
+    "pairs": [
+        {"header": "Header01.png", "footer": "Footer01.png"},
+        {"header": "Header02.png", "footer": "Footer02.png"},
+        {"header": "Header03.png", "footer": "Footer03.png"},
+        {"header": "Header04.png", "footer": "Footer04.png"},
+        {"header": "Header05.png", "footer": "Footer05.png"}
+    ]
+}

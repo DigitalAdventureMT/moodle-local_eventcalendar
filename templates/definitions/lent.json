@@ -1,0 +1,11 @@
+{
+    "template_key": "lent",
+    "name": "Calendario della Quaresima",
+    "category": "christian",
+    "days_count": 40,
+    "date_rule": {
+        "type": "computed",
+        "algorithm": "easter"
+    },
+    "progressive_unlock_default": true
+}

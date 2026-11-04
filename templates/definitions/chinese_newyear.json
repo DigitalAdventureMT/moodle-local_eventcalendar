@@ -1,0 +1,10 @@
+{
+    "template_key": "chinese_newyear",
+    "name": "Calendario del Capodanno cinese",
+    "category": "east_asian",
+    "days_count": 15,
+    "date_rule": {
+        "type": "lookup_table"
+    },
+    "progressive_unlock_default": true
+}

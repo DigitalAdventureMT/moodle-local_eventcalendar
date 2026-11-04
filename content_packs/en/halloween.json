@@ -1,0 +1,73 @@
+{
+    "language": "en",
+    "template_key": "halloween",
+    "version": 1,
+    "tagline": "Click on the boxes as they unlock day by day... if you dare to open them!",
+    "subjects": [
+        "{{name}} – a new mysterious box is waiting for you! 🎃",
+        "{{name}} – a new mysterious box is waiting for you! 👻",
+        "{{name}} – do you dare to open today's box? 🦇",
+        "{{name}} – do you dare to open today's box? 🕸️",
+        "{{name}} – trick or treat? Find out today! 🍬",
+        "{{name}} – trick or treat? Find out today! 🎃",
+        "{{name}} – something is hiding in today's box... 👻",
+        "{{name}} – something is hiding in today's box... 🦇",
+        "{{name}} – the witches' night is getting closer! 🕸️",
+        "{{name}} – the witches' night is getting closer! 🌕",
+        "{{name}} – a new spooky surprise is available! 🎃",
+        "{{name}} – a new spooky surprise is available! 🍬",
+        "{{name}} – the scariest countdown continues! 👻"
+    ],
+    "notifications": [
+        "<p>A new mysterious box is waiting for you in the Halloween calendar.</p><p>Do you dare to open it?</p>",
+        "<p>Trick or treat? The answer is in today's box!</p><p>Click to find out.</p>",
+        "<p>Something mysterious is hiding in today's calendar...</p><p>Come and see, if you dare!</p>",
+        "<p>Halloween night is getting closer and the spooky surprises keep coming.</p><p>Open today's box!</p>",
+        "<p>Pumpkins, bats and cobwebs: today's box is ready.</p><p>Discover it now!</p>",
+        "<p>The scariest countdown of the year continues.</p><p>See what's here today!</p>",
+        "<p>Today, too, the Halloween calendar has prepared something for you.</p><p>Open it, if you dare!</p>",
+        "<p>Another spooky box is waiting for you.</p><p>Click to open it.</p>",
+        "<p>The moon is high and today's box is ready to be opened.</p><p>Find out what it hides!</p>",
+        "<p>The witches' night is getting closer: don't miss today's surprise.</p><p>Open it now!</p>"
+    ],
+    "daycontents": [
+        "<p>Another box, another spooky surprise!</p>",
+        "<p>Have you already chosen your costume for Halloween night?</p>",
+        "<p>Carved pumpkins light up the windows: the witches' night is near.</p>",
+        "<p>A ghost story told in the dark is always a great idea these days.</p>",
+        "<p>Bats, cobwebs and candles: the Halloween atmosphere is growing stronger.</p>",
+        "<p>Stock up on treats: nobody wants to be tricked!</p>",
+        "<p>Today's box hides a small mystery... will you solve it?</p>",
+        "<p>The days are getting shorter and the shadows longer: Halloween is just around the corner.</p>",
+        "<p>A horror film on the sofa, a blanket and a few treats: the perfect evening.</p>",
+        "<p>The scariest countdown of the year continues: don't be afraid!</p>",
+        "<p>The witches are brewing their potions for the big night.</p>",
+        "<p>Every box you open brings you closer to the Halloween moon.</p>"
+    ],
+    "restday_daycontents": [
+        "<p>Today even the ghosts are resting. The spooky surprises start again tomorrow!</p>",
+        "<p>A day of rest: enjoy it, the calendar is waiting for you tomorrow.</p>",
+        "<p>A break in the countdown: recharge your energy for the witches' night.</p>",
+        "<p>No chills today: allow yourself a quiet day.</p>"
+    ],
+    "daycontent_first": [
+        "<p>The countdown to Halloween has begun! Every day a new mysterious box is waiting for you until the witches' night.</p>"
+    ],
+    "daycontent_last": [
+        "<p>It's Halloween night! The countdown is over: have fun with pumpkins, costumes and treats. Happy Halloween!</p>"
+    ],
+    "ctas": [
+        "Open today's box",
+        "Discover today's surprise",
+        "Go on, if you dare",
+        "Find out what's hiding",
+        "Trick or treat?",
+        "Go on",
+        "Find out more",
+        "Continue the countdown"
+    ],
+    "cta_first": [
+        "Start the countdown"
+    ],
+    "cta_last": []
+}

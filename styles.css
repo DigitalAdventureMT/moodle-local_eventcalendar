@@ -1,0 +1,429 @@
+/**
+ * Styles for local_eventcalendar.
+ *
+ * Every selector uses the local-eventcalendar- prefix so that it cannot affect other pages. Colours
+ * use the Bootstrap 5 variables when available (light and dark colour modes), with a fixed fallback
+ * for Bootstrap 4.
+ * Standalone documents (day content preview, test send result) and emails keep inline styles,
+ * because they are not rendered inside a Moodle page.
+ */
+
+/* Spacing between flex items. */
+.local-eventcalendar-gap-xs {
+    gap: 6px;
+}
+
+.local-eventcalendar-gap-sm {
+    gap: 8px;
+}
+
+.local-eventcalendar-gap-lg {
+    gap: 24px;
+}
+
+.local-eventcalendar-clickable {
+    cursor: pointer;
+}
+
+/* Calendar banner: fills the width but is never enlarged beyond its natural size. */
+.local-eventcalendar-banner {
+    display: block;
+    width: 100%;
+    max-width: max-content;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Links and badges placed above a card made clickable by stretched-link. */
+.local-eventcalendar-overlink {
+    z-index: 2;
+    vertical-align: baseline;
+}
+
+.local-eventcalendar-corner-tr,
+.local-eventcalendar-corner-bl,
+.local-eventcalendar-corner-br {
+    z-index: 2;
+}
+
+.local-eventcalendar-corner-tr {
+    top: 8px;
+    right: 8px;
+}
+
+.local-eventcalendar-corner-bl {
+    bottom: 8px;
+    left: 8px;
+}
+
+.local-eventcalendar-corner-br {
+    bottom: 8px;
+    right: 8px;
+}
+
+.local-eventcalendar-corner-tr.local-eventcalendar-corner-sm {
+    top: 4px;
+    right: 4px;
+}
+
+.local-eventcalendar-corner-bl.local-eventcalendar-corner-sm {
+    bottom: 4px;
+    left: 4px;
+}
+
+/* Calendar list: room for the corner badges and icons, so that they never cover the banner or the title.
+   The selectors include .card-body because the theme styles, loaded after these, set its padding. */
+.card-body.local-eventcalendar-listcard {
+    padding-bottom: 2.5rem;
+}
+
+.card-body.local-eventcalendar-listcard-manage {
+    padding-top: 2rem;
+}
+
+.local-eventcalendar-inlineform {
+    display: inline;
+    margin: 0;
+}
+
+/* Calendar grid: date of the day card.
+   The card width depends on the screen and on the Boost drawers, not only on the screen size: the cards are
+   narrowest on desktop, four per row, with a drawer open. The body of the card is a size container, so the
+   date font follows the width of the card (cqi units) between a minimum and the size of an h3, and a month
+   name of nine letters fits on one line. Words are never broken in the middle, as Bootstrap does in the
+   cards by default. Browsers without container units keep the h3 size. The selectors include .card-body
+   because the theme styles, loaded after these, set the size of .h3. */
+.card-body.local-eventcalendar-daycard {
+    container-type: inline-size;
+}
+
+.card-body .local-eventcalendar-daydate {
+    font-size: clamp(0.875rem, 15cqi, 1.640625rem);
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* Calendar grid: day icon in three states (locked, unlocked not visited, visited). */
+.local-eventcalendar-dayicon {
+    display: block;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    max-height: 150px;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.local-eventcalendar-dayicon-locked {
+    filter: grayscale(100%) opacity(35%);
+}
+
+.local-eventcalendar-dayicon-unvisited {
+    filter: grayscale(100%);
+}
+
+.local-eventcalendar-locked {
+    cursor: not-allowed;
+}
+
+/* Days page: read-only rows. */
+.local-eventcalendar-daycol {
+    flex: 1;
+    min-width: 280px;
+}
+
+.local-eventcalendar-daycol:first-child {
+    min-width: 220px;
+}
+
+.local-eventcalendar-daycol-icon {
+    flex: 0 0 100px;
+}
+
+.local-eventcalendar-dayicon-small {
+    display: block;
+    width: 100%;
+    max-width: 100px;
+    height: auto;
+    max-height: 100px;
+    object-fit: contain;
+}
+
+/* Days page: edit form arranged in columns. */
+.local-eventcalendar-dayform {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.local-eventcalendar-dayform-col {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 220px;
+}
+
+.local-eventcalendar-dayform-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.local-eventcalendar-dayform-actions {
+    margin-top: 16px;
+}
+
+.local-eventcalendar-iconpreview {
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+/* Preview window of the days page. */
+.local-eventcalendar-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.local-eventcalendar-modal-box {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--bs-body-bg, #fff);
+}
+
+.local-eventcalendar-modal-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.local-eventcalendar-modal-frame {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+}
+
+/* Banner and header/footer galleries of the calendar form. */
+.local-eventcalendar-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.local-eventcalendar-gallery-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 140px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.local-eventcalendar-gallery-upload {
+    justify-content: flex-end;
+}
+
+.local-eventcalendar-gallery-none {
+    justify-content: center;
+    height: 90px;
+    border: 1px dashed var(--bs-border-color, #ddd);
+    border-radius: 4px;
+}
+
+.local-eventcalendar-gallery-image {
+    max-width: 140px;
+    max-height: 90px;
+    margin-bottom: 6px;
+    object-fit: contain;
+    border: 1px solid var(--bs-border-color, #ddd);
+    border-radius: 4px;
+}
+
+.local-eventcalendar-gallery-name {
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.local-eventcalendar-gallery-label {
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.local-eventcalendar-gallery-header,
+.local-eventcalendar-gallery-footer {
+    display: block;
+    max-width: 140px;
+    max-height: 45px;
+    object-fit: contain;
+    border: 1px solid var(--bs-border-color, #ddd);
+}
+
+.local-eventcalendar-gallery-header {
+    border-radius: 4px 4px 0 0;
+}
+
+.local-eventcalendar-gallery-footer {
+    margin-bottom: 6px;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+}
+
+/* Graphic elements and icon sets pages. */
+.local-eventcalendar-graphic {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.local-eventcalendar-iconthumb {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+/* Email template form: structure preview with visible table borders. */
+.local-eventcalendar-emailpreview {
+    padding: 10px;
+    overflow: auto;
+    background-color: var(--bs-tertiary-bg, #fafafa);
+}
+
+.local-eventcalendar-emailpreview table,
+.local-eventcalendar-emailpreview td,
+.local-eventcalendar-emailpreview th {
+    border: 1px solid #999 !important; /* stylelint-disable-line declaration-no-important */
+}
+
+/* Access rules page. */
+.local-eventcalendar-separator {
+    font-size: 1.1rem;
+}
+
+.local-eventcalendar-autoselect {
+    width: auto;
+    max-width: 100%;
+}
+
+.local-eventcalendar-rulesubject {
+    min-width: 220px;
+}
+
+/* Font weight and spacing that are the same in Bootstrap 4 and 5. */
+.local-eventcalendar-bold {
+    font-weight: bold;
+}
+
+.local-eventcalendar-me {
+    margin-inline-end: 0.5rem;
+}
+
+.local-eventcalendar-ms {
+    margin-inline-start: 0.5rem;
+}
+
+.local-eventcalendar-push-end {
+    margin-inline-start: auto;
+}
+
+/* Publishing dialog of the calendar management page: a carousel shows up to three options side by side
+   (two from 768px, one below). Without JavaScript all options are visible and wrap on more rows. */
+.local-eventcalendar-publish {
+    width: 95vw;
+    max-width: 1100px;
+    max-height: 90vh;
+    margin: 5vh auto auto;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    color: inherit;
+    background: var(--bs-body-bg, #fff);
+}
+
+.local-eventcalendar-publish::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.local-eventcalendar-publish-body {
+    padding: 1.5rem;
+}
+
+.local-eventcalendar-publish-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.local-eventcalendar-publish-option {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+/* With the carousel active every option takes its share of the row, also on the last page, so that
+   the options keep the same width while browsing. The dialog stays at the top for the same reason:
+   the navigation buttons do not move when the height of the options changes. */
+.local-eventcalendar-publish-options[data-size] {
+    flex-wrap: nowrap;
+}
+
+.local-eventcalendar-publish-options[data-size="2"] > .local-eventcalendar-publish-option {
+    flex: 0 0 calc((100% - 16px) / 2);
+}
+
+.local-eventcalendar-publish-options[data-size="3"] > .local-eventcalendar-publish-option {
+    flex: 0 0 calc((100% - 32px) / 3);
+}
+
+.local-eventcalendar-publish-preview {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: 0.5rem;
+    overflow-x: auto;
+    border: 1px dashed var(--bs-border-color, #ddd);
+    border-radius: 4px;
+}
+
+/* The theme colour of code (pink in Bootstrap 4) has not enough contrast on white: the menu line uses the text colour. */
+.local-eventcalendar-publish-preview code {
+    color: inherit;
+}
+
+.local-eventcalendar-publish-qrcode {
+    width: 100%;
+    max-width: 160px;
+    height: auto;
+}
+
+/* Calendar reports page: progress bars of the unlocked days. */
+.local-eventcalendar-progress {
+    min-width: 180px;
+}

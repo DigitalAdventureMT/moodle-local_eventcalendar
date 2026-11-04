@@ -1,0 +1,77 @@
+{
+    "language": "en",
+    "template_key": "chinese_newyear",
+    "version": 1,
+    "tagline": "Click on the boxes as they unlock day by day: the countdown to Chinese New Year has begun!",
+    "subjects": [
+        "{{name}} – a new box is waiting for you! 🏮",
+        "{{name}} – a new box is waiting for you! 🧧",
+        "{{name}} – the countdown continues! 🐉",
+        "{{name}} – the countdown continues! 🎆",
+        "{{name}} – discover today's surprise! 🏮",
+        "{{name}} – discover today's surprise! 🥟",
+        "{{name}} – Chinese New Year is getting closer! 🧧",
+        "{{name}} – Chinese New Year is getting closer! 🐉",
+        "{{name}} – new box available! 🎆",
+        "{{name}} – new box available! 🏮",
+        "{{name}} – there's something special for you today! 🥟",
+        "{{name}} – there's something special for you today! 🧧",
+        "{{name}} – fewer and fewer days to go! 🐉",
+        "{{name}} – fewer and fewer days to go! 🎆",
+        "{{name}} – time to open today's box! 🏮"
+    ],
+    "notifications": [
+        "<p>The countdown to Chinese New Year continues: there's a new box to open today!</p><p>Discover what it holds.</p>",
+        "<p>Curious to find out what's waiting for you today in the Chinese New Year calendar?</p><p>Open it now!</p>",
+        "<p>Red lanterns and good fortune: today's box is ready for you.</p><p>Click to discover it.</p>",
+        "<p>One day less to the Spring Festival and a new surprise to discover.</p><p>Come and see it!</p>",
+        "<p>Today, too, the calendar has prepared something for you.</p><p>Open today's box.</p>",
+        "<p>The lunar new year is getting closer: see what's in the calendar today.</p><p>Find out now!</p>",
+        "<p>Good morning! Today's surprise is waiting for you.</p><p>Have a look.</p>",
+        "<p>A new box, a new tradition to discover.</p><p>Click to open it.</p>",
+        "<p>Fewer and fewer days to the celebrations.</p><p>Don't miss today's box!</p>",
+        "<p>The surprises keep coming: today's box is waiting just for you.</p><p>Open it now!</p>"
+    ],
+    "daycontents": [
+        "<p>Another day, another box: the lunar new year is getting closer and closer!</p>",
+        "<p>Chinese New Year is also called the Spring Festival: it marks the passage to a new season.</p>",
+        "<p>Before the festival it is a tradition to clean the house, to make room for the good luck of the new year.</p>",
+        "<p>Red is the colour of the festival: it brings good luck and keeps bad influences away.</p>",
+        "<p>Red lanterns decorate streets and homes in the days before the new year.</p>",
+        "<p>Red envelopes with a small gift are one of the most typical gestures of the festival.</p>",
+        "<p>Dumplings, a symbol of prosperity, are among the most loved dishes of the festival.</p>",
+        "<p>Each year is associated with one of the twelve animals of the Chinese zodiac: do you know yours?</p>",
+        "<p>Strips of red paper with handwritten wishes decorate the doors of the houses.</p>",
+        "<p>The New Year's Eve dinner brings the whole family together: it is the most awaited moment of the festival.</p>",
+        "<p>Fireworks and drums announce the arrival of the new year.</p>",
+        "<p>The lion dance and the dragon dance bring joy and good fortune to the streets.</p>",
+        "<p>A sincere wish to someone you care about is the best way to get ready for the new year.</p>",
+        "<p>The lunar new year is getting closer: keep up the countdown!</p>"
+    ],
+    "restday_daycontents": [
+        "<p>Today is a day of rest: enjoy it, the countdown starts again tomorrow.</p>",
+        "<p>A break in the countdown: relax and spend time with the people you love.</p>",
+        "<p>No box to discover today: allow yourself a quiet day.</p>",
+        "<p>A day of rest: recharge your energy for the celebrations ahead.</p>"
+    ],
+    "daycontent_first": [
+        "<p>The countdown has begun! Every day a new box will accompany you until the first day of the lunar new year.</p>"
+    ],
+    "daycontent_last": [
+        "<p>Happy New Year! The lunar new year has arrived: may it bring you health, serenity and prosperity. Best wishes to you and your loved ones!</p>"
+    ],
+    "ctas": [
+        "Discover today's box",
+        "Continue the countdown",
+        "Go to today's surprise",
+        "Open the box",
+        "Discover today's tradition",
+        "Find out more",
+        "Go on",
+        "Continue towards the new year"
+    ],
+    "cta_first": [
+        "Start the countdown"
+    ],
+    "cta_last": []
+}

@@ -1,0 +1,10 @@
+# Local development files, never part of the plugin.
+# Node modules installed to run grunt (amd build) stay outside the repository.
+node_modules/
+# Editor and operating system files.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+# Packages built locally for the installation tests.
+*.zip
