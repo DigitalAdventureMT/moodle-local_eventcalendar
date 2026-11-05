@@ -216,8 +216,14 @@ final class notification_dispatcher_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $days = \local_eventcalendar\persistent\day::get_records(['calendarid' => $this->calendar->get('id')]);
         $day = reset($days);
-        $image = \moodle_url::make_pluginfile_url(\context_system::instance()->id, 'local_eventcalendar',
-            'notificationmessage', 9, '/', 'pic.png');
+        $image = \moodle_url::make_pluginfile_url(
+            \context_system::instance()->id,
+            'local_eventcalendar',
+            'notificationmessage',
+            9,
+            '/',
+            'pic.png'
+        );
         $day->set('notifbody', '<p>Hello</p><img src="' . $image->out() . '" alt="">');
 
         $sink = $this->redirectEmails();

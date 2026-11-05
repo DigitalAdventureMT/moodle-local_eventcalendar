@@ -412,8 +412,11 @@ class calendar_form extends \core\form\persistent {
             'aria-label' => $label,
         ]);
 
-        $extra = array_map(fn($option) => $option + ['class' => 'local-eventcalendar-gallery-upload'],
-            $this->extragalleryoptions[$gallery]);
+        // The options of the other plugins get the class that aligns them to the bottom of the row.
+        $extra = array_map(
+            fn($option) => $option + ['class' => 'local-eventcalendar-gallery-upload'],
+            $this->extragalleryoptions[$gallery]
+        );
 
         foreach (array_merge($options, $extra) as $option) {
             $radio = [

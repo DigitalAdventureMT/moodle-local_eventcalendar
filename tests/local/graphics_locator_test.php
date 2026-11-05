@@ -22,6 +22,8 @@ namespace local_eventcalendar\local;
  *
  * Only the files shipped with the plugin are available in the test environment: the tests check
  * the behaviour of the locator on the plugin root, which is the only one guaranteed to exist.
+ * The file names used here (for example Banner01.png) must match the files of pix/ exactly, because
+ * the file system of the test servers is case and name sensitive.
  *
  * @package     local_eventcalendar
  * @covers      \local_eventcalendar\local\graphics_locator
@@ -54,7 +56,7 @@ final class graphics_locator_test extends \advanced_testcase {
      * A file shipped with the plugin is found, a missing one is not.
      */
     public function test_find_file(): void {
-        $path = graphics_locator::find_file(graphics_locator::BANNERS, 'Banner1.png');
+        $path = graphics_locator::find_file(graphics_locator::BANNERS, 'Banner01.png');
         $this->assertNotNull($path);
         $this->assertFileExists($path);
 
@@ -87,9 +89,9 @@ final class graphics_locator_test extends \advanced_testcase {
      * The URL of a file of the plugin is the same one used before the introduction of the packs.
      */
     public function test_url_of_a_plugin_file(): void {
-        $url = graphics_locator::get_url(graphics_locator::BANNERS, 'Banner1.png');
+        $url = graphics_locator::get_url(graphics_locator::BANNERS, 'Banner01.png');
 
-        $this->assertSame('/local/eventcalendar/pix/banners/Banner1.png', $url->out_as_local_url(false));
+        $this->assertSame('/local/eventcalendar/pix/banners/Banner01.png', $url->out_as_local_url(false));
     }
 
     /**

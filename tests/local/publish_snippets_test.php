@@ -37,7 +37,7 @@ final class publish_snippets_test extends \advanced_testcase {
         global $DB;
 
         return $DB->insert_record('local_eventcalendar_banner', (object) [
-            'name' => 'Banner', 'identifier' => 'testbanner', 'filename' => 'Banner1.png',
+            'name' => 'Banner', 'identifier' => 'testbanner', 'filename' => 'Banner01.png',
             'timecreated' => time(), 'timemodified' => time(),
         ]);
     }
@@ -117,5 +117,4 @@ final class publish_snippets_test extends \advanced_testcase {
         $this->assertSame(['link', 'card', 'button'], array_column($snippets, 'key'));
         $this->assertStringContainsString('<img src="' . $bannerurl . '" class="card-img-top" alt="">', $options['card']['code']);
     }
-
 }
