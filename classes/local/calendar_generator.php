@@ -55,11 +55,63 @@ use local_eventcalendar\persistent\iconset;
  * Other plugins take part through hooks: days_created after new days are generated, restdays_changed after the
  * existing days are realigned to a new rest day setting, days_deleting before days are deleted.
  *
+ * The length of a calendar is limited by the "maxdays" setting (get_max_days()), because every day is created
+ * in the request that saves the calendar. The limit applies only when days would be created: a calendar
+ * already longer than the limit (created before the setting existed, or before it was lowered) keeps its days
+ * and can still be edited, as long as its dates do not require new days. The calendar form applies the same
+ * rule (exceeds_max_days()), so the error is shown to the user before anything is saved; the check in
+ * sync_extend() protects the other callers, such as imports or other plugins.
+ *
  * @package     local_eventcalendar
  * @copyright   2026 Marco Tosatto <marco.tosatto@digitaladventure.it>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class calendar_generator {
+    /** Default maximum number of days of a calendar, used when the setting is missing or invalid. */
+    public const DEFAULT_MAX_DAYS = 366;
+
+    /**
+     * Returns the maximum number of days of a calendar, from the plugin settings.
+     *
+     * The setting accepts only positive integers; any other stored value (missing, empty, zero) falls back to
+     * the default, so the generation is always bounded.
+     *
+     * @return int
+     */
+    public static function get_max_days(): int {
+        $maxdays = (int) get_config('local_eventcalendar', 'maxdays');
+
+        return $maxdays > 0 ? $maxdays : self::DEFAULT_MAX_DAYS;
+    }
+
+    /**
+     * Number of days between two dates, both included.
+     *
+     * The result is rounded so that a daylight saving change between the two dates does not alter it.
+     *
+     * @param int $startdate
+     * @param int $enddate
+     * @return int
+     */
+    public static function count_days(int $startdate, int $enddate): int {
+        return (int) round(($enddate - $startdate) / DAYSECS) + 1;
+    }
+
+    /**
+     * Tells whether a calendar would exceed the maximum length by creating new days.
+     *
+     * Single rule shared by the form validation and by sync_extend(): no day is created while the calendar
+     * is longer than the limit. Without days to create nothing heavy happens, so a calendar that is already
+     * too long is accepted as it is.
+     *
+     * @param int $targetcount number of days of the calendar with the new dates
+     * @param int $missingcount number of days that would be created
+     * @return bool
+     */
+    public static function exceeds_max_days(int $targetcount, int $missingcount): bool {
+        return $missingcount > 0 && $targetcount > self::get_max_days();
+    }
+
     /**
      * Zero-based index of the day falling on the given date, relative to the calendar start.
      *
@@ -95,7 +147,7 @@ class calendar_generator {
             return $result;
         }
 
-        $targetcount = (int) round(($enddate - $startdate) / DAYSECS) + 1;
+        $targetcount = self::count_days($startdate, $enddate);
 
         $covered = [];
         foreach (day::get_records(['calendarid' => $calendarid], 'opendate', 'ASC') as $existingday) {
@@ -177,6 +229,7 @@ class calendar_generator {
      *
      * @param calendar $calendar must already reflect the saved dates (after update()/create())
      * @return int number of days actually generated
+     * @throws \moodle_exception errortoomanydays if new days are needed and the calendar exceeds the maximum length
      */
     public static function sync_extend(calendar $calendar): int {
         $startdate = (int) $calendar->get('startdate');
@@ -186,10 +239,18 @@ class calendar_generator {
             return 0;
         }
 
-        $targetcount = (int) round(($enddate - $startdate) / DAYSECS) + 1;
+        $targetcount = self::count_days($startdate, $enddate);
 
         // Renumber existing days by date; the remaining numbers (start, end or both) are the missing ones.
         $covered = self::renumber_days($calendar, $targetcount);
+
+        // The length limit is checked before the list of missing numbers is built: with an unbounded range
+        // even range() would allocate one item per day. Renumbering the existing days above is harmless, as
+        // it only aligns their numbers to their dates.
+        if (self::exceeds_max_days($targetcount, $targetcount - count($covered))) {
+            throw new \moodle_exception('errortoomanydays', 'local_eventcalendar', '', self::get_max_days());
+        }
+
         $missingnumbers = array_values(array_diff(range(1, $targetcount), $covered));
 
         // Content pack of the calendar (template and language chosen in the calendar), if one exists.

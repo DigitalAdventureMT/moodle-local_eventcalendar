@@ -53,6 +53,19 @@ if ($hassiteconfig) {
             \local_eventcalendar\local\notification_dispatcher::DEFAULT_MAX_EMAILS,
             PARAM_INT
         ));
+
+        // Maximum length of a calendar. All the days of a calendar are created in the request that saves it,
+        // so the limit keeps that request and the pages listing the days within reasonable time and memory.
+        // Only positive integers are accepted (the regular expression replaces PARAM_INT, which would also
+        // accept 0 and negative values): there is deliberately no "no limit" value.
+        $page->add(new admin_setting_configtext(
+            'local_eventcalendar/maxdays',
+            get_string('maxdays', 'local_eventcalendar'),
+            get_string('maxdays_desc', 'local_eventcalendar'),
+            \local_eventcalendar\local\calendar_generator::DEFAULT_MAX_DAYS,
+            '/^[1-9][0-9]{0,4}$/',
+            6
+        ));
     }
     $ADMIN->add('local_eventcalendar', $page);
 }

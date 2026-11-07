@@ -309,9 +309,15 @@ switch ($action) {
                         'total' => count($snippets),
                     ]);
                 }
+                // The template escapes the title ({{title}}), so the name is formatted without escaping:
+                // format_string() would otherwise turn "&" into "&amp;" and the dialog would show it literally.
                 $dialogs[] = $OUTPUT->render_from_template('local_eventcalendar/publish_dialog', [
                     'id' => $dialogid,
-                    'title' => get_string('publishtitle', 'local_eventcalendar', format_string($calendaritem->get('name'))),
+                    'title' => get_string(
+                        'publishtitle',
+                        'local_eventcalendar',
+                        format_string($calendaritem->get('name'), true, ['escape' => false])
+                    ),
                     'snippets' => $snippets,
                 ]);
 

@@ -25,6 +25,7 @@
 namespace local_eventcalendar\form;
 
 use local_eventcalendar\hook\emailtemplate_form_definition;
+use local_eventcalendar\local\email_template_preview;
 use local_eventcalendar\persistent\email_template;
 
 defined('MOODLE_INTERNAL') || die();
@@ -53,6 +54,8 @@ class email_template_form extends \core\form\persistent {
      * Defines the form elements.
      */
     public function definition() {
+        global $PAGE;
+
         $mform = $this->_form;
 
         $mform->addElement('text', 'name', get_string('emailtplname', 'local_eventcalendar'), ['size' => '50']);
@@ -64,13 +67,24 @@ class email_template_form extends \core\form\persistent {
         $mform->addRule('language', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('language', 'emailtpllanguage', 'local_eventcalendar');
 
-        // Static preview of the saved content; it is not updated while typing.
-        // Table borders are forced visible (!important overrides border="0")
-        // to show the structure; placeholders stay unresolved.
-        $currentcontent = $this->get_persistent()->get('content') ?? '';
-        $previewhtml = '<div id="eventcalendar-emailtpl-preview" class="local-eventcalendar-emailpreview">'
-            . $currentcontent
-            . '</div>';
+        // Static preview of the saved content; it is not updated while typing, and the placeholders stay
+        // unresolved. The content is raw HTML that add-ons can let users change or import, so it is never
+        // printed in this page: it is loaded in an iframe from email_template_preview.php, which shows it with
+        // the table borders forced visible under a sandbox without scripts (same sandbox on the frame and, as a
+        // header, on the page). The module email_template_preview fits the height of the frame to its content.
+        // The element keeps the name contentpreview, which add-ons use to place their fields before it.
+        $templateid = (int) $this->get_persistent()->get('id');
+        $previewhtml = '';
+        if ($templateid) {
+            $previewhtml = \html_writer::tag('iframe', '', [
+                'src' => email_template_preview::get_url($templateid)->out(false),
+                'sandbox' => email_template_preview::SANDBOX,
+                'title' => get_string('emailtplpreview', 'local_eventcalendar'),
+                'class' => 'local-eventcalendar-emailpreview-frame',
+                'data-region' => 'local-eventcalendar-emailpreview',
+            ]);
+            $PAGE->requires->js_call_amd('local_eventcalendar/email_template_preview', 'init');
+        }
 
         $mform->addElement('static', 'contentpreview', get_string('emailtplpreview', 'local_eventcalendar'), $previewhtml);
         $mform->addHelpButton('contentpreview', 'emailtplpreview', 'local_eventcalendar');

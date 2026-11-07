@@ -144,7 +144,7 @@ The elements distributed with the plugin are read from its folders:
 - email templates: `email_templates/<language>/`, an HTML file with a `.json` metadata file;
 - content and notification packs: `content_packs/<language>/<template>.json`.
 
-New elements are imported at the next installation or upgrade of the plugin, or with the detection buttons of the management pages.
+New elements are imported at the installation and at every upgrade of the plugin, or with the detection buttons of the management pages. Elements already imported are never changed; an element deleted from Moodle whose files are still in the folders is imported again.
 
 ## Subplugins
 

@@ -286,7 +286,8 @@ class calendar_form extends \core\form\persistent {
      *
      * @param string $gallery GALLERY_BANNER or GALLERY_HEADERFOOTER.
      * @param string $value Value of the radio.
-     * @param string $label Label of the option, HTML already escaped.
+     * @param string $label Label of the option, trusted HTML printed as it is: every value not written by the
+     *     callback must be escaped (s(), format_string(), html_writer).
      * @param bool $checked Whether the option is the current choice of the calendar.
      */
     public function add_gallery_option(string $gallery, string $value, string $label, bool $checked = false): void {
@@ -485,6 +486,38 @@ class calendar_form extends \core\form\persistent {
             $errors['enddate'] = get_string('errorenddatebeforestart', 'local_eventcalendar');
         }
 
+        // Preview of the day synchronisation with the new dates, without changing anything. It is needed by two
+        // checks (maximum length here, days to delete further down), so it is computed once. It exists only for a
+        // saved calendar with valid dates: a new calendar has no days, so all its days are missing.
+        $persistentid = (int) $this->get_persistent()->get('id');
+        $validdates = !empty($data->startdate) && !empty($data->enddate) && $data->enddate >= $data->startdate;
+        $preview = null;
+        if ($validdates && !empty($persistentid)) {
+            $preview = \local_eventcalendar\local\calendar_generator::sync_preview(
+                $persistentid,
+                (int) $data->startdate,
+                (int) $data->enddate
+            );
+        }
+
+        // Maximum length: same rule as the generator (calendar_generator::exceeds_max_days()), checked here so that
+        // the user gets the error with the form values preserved, instead of a calendar saved without its days.
+        // A calendar already longer than the limit is refused only if the new dates would create days.
+        if ($validdates) {
+            $targetcount = \local_eventcalendar\local\calendar_generator::count_days(
+                (int) $data->startdate,
+                (int) $data->enddate
+            );
+            $missingcount = $preview ? (int) $preview->missingcount : $targetcount;
+            if (\local_eventcalendar\local\calendar_generator::exceeds_max_days($targetcount, $missingcount)) {
+                $errors['enddate'] = get_string(
+                    'errortoomanydays',
+                    'local_eventcalendar',
+                    \local_eventcalendar\local\calendar_generator::get_max_days()
+                );
+            }
+        }
+
         if (empty($data->iconsetid)) {
             $errors['iconsetid'] = get_string('errornoiconsetselected', 'local_eventcalendar');
         }
@@ -510,14 +543,8 @@ class calendar_form extends \core\form\persistent {
 
         // Check which generated days would fall outside the new date range (end moved earlier or start
         // moved later). Done here so that, on error, Moodle redisplays the form with all values preserved.
-        $persistentid = $this->get_persistent()->get('id');
-        if (!empty($persistentid) && !empty($data->startdate) && !empty($data->enddate) && $data->enddate >= $data->startdate) {
-            $preview = \local_eventcalendar\local\calendar_generator::sync_preview(
-                $persistentid,
-                (int) $data->startdate,
-                (int) $data->enddate
-            );
-
+        // The preview was computed above, for saved calendars with valid dates only.
+        if ($preview !== null) {
             if (!empty($preview->extradays) && empty($data->confirmshrink)) {
                 $dateformat = get_string('strftimedaydate', 'local_eventcalendar');
                 $daylist = implode(', ', array_map(

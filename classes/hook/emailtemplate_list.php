@@ -32,7 +32,13 @@ use local_eventcalendar\persistent\email_template;
  *
  * The page dispatches it before printing the list, also when the list is empty, so the callbacks can
  * contribute row actions. The items shown are available with
- * get_templates(). The HTML added by the callbacks must be already escaped. They do not return a value.
+ * get_templates(). They do not return a value.
+ *
+ * Trusted HTML: the HTML added by the callbacks is printed as it is, without any filter, because it comes from
+ * plugin code. The callbacks must escape every value they did not write themselves (names, texts entered by
+ * users, data read from the database or from a request): s() or format_string() for text, format_text() for
+ * rich text, html_writer for tags and attributes. An unescaped value would let whoever controls it inject
+ * markup or scripts into the page of a manager.
  *
  * @package     local_eventcalendar
  * @copyright   2026 Marco Tosatto <marco.tosatto@digitaladventure.it>

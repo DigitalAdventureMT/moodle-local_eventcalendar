@@ -82,6 +82,30 @@ class notification_dispatcher {
     /** Sending attempts of a notification: a failed sending is retried once, by the next run. */
     public const MAX_ATTEMPTS = 2;
 
+    /** Entries of the queue processed together in phase 2: their user records are loaded with one query. */
+    public const BATCH_SIZE = 200;
+
+    /** Position in a queue entry: send time. */
+    private const QUEUE_SENDAT = 0;
+
+    /** Position in a queue entry: pseudo-random order for the same send time. */
+    private const QUEUE_ORDER = 1;
+
+    /** Position in a queue entry: calendar id. */
+    private const QUEUE_CALENDARID = 2;
+
+    /** Position in a queue entry: day id. */
+    private const QUEUE_DAYID = 3;
+
+    /** Position in a queue entry: user id. */
+    private const QUEUE_USERID = 4;
+
+    /** Position in a queue entry: id of the record of a failed sending to retry, 0 if none. */
+    private const QUEUE_SENTID = 5;
+
+    /** Position in a queue entry: attempts already made (0, or 1 for a retry). */
+    private const QUEUE_ATTEMPTS = 6;
+
     /** Test send result: email sent. */
     public const TEST_SENT = 'sent';
 
@@ -101,11 +125,23 @@ class notification_dispatcher {
      * - for the same send time, a pseudo-random order that changes every day, so that the same users
      *   are not always the last ones to receive the notification.
      *
+     * The work is split in two phases, so that the memory used does not depend on the size of the user
+     * records of all the subscribers:
+     * 1. collect_due() reads the subscriptions with a recordset, with only the time zone of each user, and
+     *    builds a compact queue of the notifications due (small arrays of numbers, see QUEUE_*). The order
+     *    needs the send time, which depends only on the time zone.
+     * 2. The sorted queue is processed in batches of BATCH_SIZE entries: only for these users the complete
+     *    records are loaded, the access rule data prefetched, visibility and access rules checked, and the
+     *    notifications sent. The run stops as soon as the limit is reached, so the users after it are never
+     *    loaded.
+     * The complete records are needed by the access rules, which may read any column of the user (for
+     * example the profile rule of an add-on), and by the messaging API.
+     *
      * @param int $now Current time (timestamp).
      * @return int Number of notifications sent.
      */
     public static function dispatch(int $now): int {
-        global $DB, $PAGE;
+        global $PAGE;
 
         // Only days whose UTC date is within two days of now. In any timezone (UTC-12 to UTC+14) the send
         // window of a day falls within 36 hours of its UTC date. Without such days nothing is due, and the
@@ -119,28 +155,30 @@ class notification_dispatcher {
         }
 
         $daysbycalendar = [];
+        $daysbyid = [];
         foreach ($days as $day) {
             $daysbycalendar[(int) $day->get('calendarid')][] = $day;
+            $daysbyid[(int) $day->get('id')] = $day;
         }
 
-        // Subscriptions and users of those calendars only. Users are read with a subquery rather than a
-        // list of ids, which some databases limit in length; deleted and suspended users are left out,
-        // as they receive nothing.
-        [$insql, $inparams] = $DB->get_in_or_equal(array_keys($daysbycalendar), SQL_PARAMS_NAMED);
-        $subscriptions = $DB->get_records_select('local_eventcalendar_subscr', "calendarid $insql", $inparams);
-        if (empty($subscriptions)) {
+        // Phase 1: compact queue of the notifications due, for all the calendars.
+        $queue = [];
+        $calendars = [];
+        foreach ($daysbycalendar as $calendarid => $calendardays) {
+            $calendar = calendar::get_record(['id' => $calendarid]);
+            if (!$calendar) {
+                continue;
+            }
+            $calendars[$calendarid] = $calendar;
+            self::collect_due($calendarid, $calendardays, $now, $queue);
+        }
+        if (empty($queue)) {
             return 0;
         }
 
-        $users = $DB->get_records_select(
-            'user',
-            "deleted = 0 AND suspended = 0 AND id IN (SELECT userid FROM {local_eventcalendar_subscr} WHERE calendarid $insql)",
-            $inparams
-        );
-        // The profile description is not used and may be long: it is dropped to save memory.
-        foreach ($users as $user) {
-            unset($user->description);
-        }
+        usort($queue, function (array $a, array $b): int {
+            return [$a[self::QUEUE_SENDAT], $a[self::QUEUE_ORDER]] <=> [$b[self::QUEUE_SENDAT], $b[self::QUEUE_ORDER]];
+        });
 
         // The page context may not be set in a task, but the text filters used by the renderers need it.
         $PAGE->set_context(\context_system::instance());
@@ -148,69 +186,121 @@ class notification_dispatcher {
         // Access rules are reloaded on every run, as the task process may stay alive for a long time.
         access_rules::reset_cache();
 
-        $bycalendar = [];
-        foreach ($subscriptions as $subscription) {
-            $bycalendar[(int) $subscription->calendarid][] = $subscription;
-        }
-
-        $queue = [];
-        foreach ($bycalendar as $calendarid => $calendarsubscriptions) {
-            $queue = array_merge(
-                $queue,
-                self::get_due_notifications($calendarid, $daysbycalendar[$calendarid], $calendarsubscriptions, $users, $now)
-            );
-        }
-
-        usort($queue, function (\stdClass $a, \stdClass $b): int {
-            return [$a->sendat, $a->order] <=> [$b->sendat, $b->order];
-        });
-
+        // Phase 2: the queue in batches, with the complete records of the users of each batch only.
         $limit = self::get_max_emails();
         $context = \context_system::instance();
         $sent = 0;
         $attempts = 0;
+        $allowed = [];
+        $total = count($queue);
 
-        foreach ($queue as $item) {
-            if ($limit > 0 && $attempts >= $limit) {
-                break;
-            }
+        for ($offset = 0; $offset < $total; $offset += self::BATCH_SIZE) {
+            $batch = array_slice($queue, $offset, self::BATCH_SIZE);
+            $users = self::load_batch_users($batch, $calendars);
 
-            // Moodle would refuse the email: the notification is recorded as skipped (no attempts), so that
-            // the in-app notification is not created again by every run while the email keeps failing.
-            if (!self::can_receive_email($item->user)) {
-                mtrace('local_eventcalendar: notification not sent, invalid email address of user ' . $item->user->id);
-                self::record($item, null, 0);
-                continue;
-            }
+            foreach ($batch as $entry) {
+                if ($limit > 0 && $attempts >= $limit) {
+                    return $sent;
+                }
 
-            // A day with nothing to say is not sent and not recorded: it is sent if a text is added later
-            // in the day.
-            $content = self::build_content($item->calendar, $item->day, $item->user, $context);
-            if ($content === null) {
-                continue;
-            }
+                // A user deleted or suspended since phase 1 receives nothing.
+                $user = $users[$entry[self::QUEUE_USERID]] ?? null;
+                if (!$user) {
+                    continue;
+                }
 
-            $attempts++;
-            $attempt = $item->attempts + 1;
-            if (static::send_message(self::build_message($item->calendar, $item->day, $item->user, $content))) {
-                self::record($item, $now, $attempt);
-                $sent++;
-                continue;
-            }
+                // Visibility of the calendar (dates in the time zone of the user) and access rules, once per
+                // calendar and user in the run.
+                $calendar = $calendars[$entry[self::QUEUE_CALENDARID]];
+                $key = $entry[self::QUEUE_CALENDARID] . ':' . $entry[self::QUEUE_USERID];
+                if (!isset($allowed[$key])) {
+                    $allowed[$key] = $calendar->is_visible($user) && access_rules::user_can_access($calendar, $user);
+                }
+                if (!$allowed[$key]) {
+                    continue;
+                }
 
-            // Failed: retried once by the next run, then given up. Every attempt creates the in-app
-            // notification again, so a single retry limits the duplicates to one.
-            self::record($item, null, $attempt);
-            if ($attempt >= self::MAX_ATTEMPTS) {
-                mtrace('local_eventcalendar: notification not sent after ' . $attempt . ' attempts, user '
-                    . $item->user->id . ', day ' . $item->day->get('id'));
-            } else {
-                mtrace('local_eventcalendar: notification not sent, retried by the next run, user '
-                    . $item->user->id . ', day ' . $item->day->get('id'));
+                $item = (object) [
+                    'calendar' => $calendar,
+                    'day' => $daysbyid[$entry[self::QUEUE_DAYID]],
+                    'user' => $user,
+                    'sentid' => $entry[self::QUEUE_SENTID],
+                    'attempts' => $entry[self::QUEUE_ATTEMPTS],
+                ];
+
+                // Moodle would refuse the email: the notification is recorded as skipped (no attempts), so that
+                // the in-app notification is not created again by every run while the email keeps failing.
+                if (!self::can_receive_email($item->user)) {
+                    mtrace('local_eventcalendar: notification not sent, invalid email address of user ' . $item->user->id);
+                    self::record($item, null, 0);
+                    continue;
+                }
+
+                // A day with nothing to say is not sent and not recorded: it is sent if a text is added later
+                // in the day.
+                $content = self::build_content($item->calendar, $item->day, $item->user, $context);
+                if ($content === null) {
+                    continue;
+                }
+
+                $attempts++;
+                $attempt = $item->attempts + 1;
+                if (static::send_message(self::build_message($item->calendar, $item->day, $item->user, $content))) {
+                    self::record($item, $now, $attempt);
+                    $sent++;
+                    continue;
+                }
+
+                // Failed: retried once by the next run, then given up. Every attempt creates the in-app
+                // notification again, so a single retry limits the duplicates to one.
+                self::record($item, null, $attempt);
+                if ($attempt >= self::MAX_ATTEMPTS) {
+                    mtrace('local_eventcalendar: notification not sent after ' . $attempt . ' attempts, user '
+                        . $item->user->id . ', day ' . $item->day->get('id'));
+                } else {
+                    mtrace('local_eventcalendar: notification not sent, retried by the next run, user '
+                        . $item->user->id . ', day ' . $item->day->get('id'));
+                }
             }
         }
 
         return $sent;
+    }
+
+    /**
+     * Loads the complete records of the users of a batch of the queue and prefetches their access rule data.
+     *
+     * The records are those of the user table, without the profile description (long and never used).
+     * Deleted and suspended users are left out again, as they may have changed since phase 1. The access rule
+     * data are loaded with one query per rule and calendar, for all the users of the batch.
+     *
+     * @param array[] $batch Entries of the queue.
+     * @param calendar[] $calendars Calendars of the queue, indexed by id.
+     * @return \stdClass[] User records indexed by id.
+     */
+    private static function load_batch_users(array $batch, array $calendars): array {
+        global $DB;
+
+        $userids = [];
+        $bycalendar = [];
+        foreach ($batch as $entry) {
+            $userids[$entry[self::QUEUE_USERID]] = $entry[self::QUEUE_USERID];
+            $bycalendar[$entry[self::QUEUE_CALENDARID]][$entry[self::QUEUE_USERID]] = $entry[self::QUEUE_USERID];
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal(array_values($userids), SQL_PARAMS_NAMED);
+        $users = $DB->get_records_select('user', "id $insql AND deleted = 0 AND suspended = 0", $inparams);
+        foreach ($users as $user) {
+            unset($user->description);
+        }
+
+        foreach ($bycalendar as $calendarid => $calendaruserids) {
+            if (isset($calendars[$calendarid])) {
+                access_rules::prefetch($calendarid, array_values($calendaruserids));
+            }
+        }
+
+        return $users;
     }
 
     /**
@@ -295,59 +385,65 @@ class notification_dispatcher {
     }
 
     /**
-     * Returns the notifications of a calendar due at the given time and not yet sent.
+     * Adds to the queue the notifications of a calendar due at the given time and not yet sent.
      *
-     * The cheap checks (already sent, send window, subscription time) come first: the visibility of
-     * the calendar and the access rules are checked only for users with a notification due, so that
-     * the runs after the morning sending cost little.
+     * Only the cheap checks are done here (already handled, send window, subscription time), with the time zone
+     * of each user: the visibility of the calendar and the access rules need the complete user record, so they
+     * are checked in phase 2, only for the users reached before the limit of the run.
+     *
+     * The subscriptions are read with a recordset joined to the user table, reading only the time zone; deleted
+     * and suspended users are left out. The notifications already handled for these days are kept in a map of
+     * numbers: -1 for those not to send again, the record id for a notification that failed once and is retried.
      *
      * @param int $calendarid
      * @param day[] $days Days of the calendar near the given time.
-     * @param \stdClass[] $subscriptions Subscriptions to that calendar.
-     * @param \stdClass[] $users Active user records indexed by id.
      * @param int $now
-     * @return \stdClass[] items with calendar, day, user, sendat (send time) and order (position for the same send time)
+     * @param array[] $queue Queue to fill, by reference: one entry per notification due (see QUEUE_*).
      */
-    private static function get_due_notifications(
-        int $calendarid,
-        array $days,
-        array $subscriptions,
-        array $users,
-        int $now
-    ): array {
+    private static function collect_due(int $calendarid, array $days, int $now, array &$queue): void {
         global $DB;
 
-        if (!calendar::record_exists($calendarid)) {
-            return [];
-        }
-
-        $calendar = new calendar($calendarid);
-
-        // Notifications already handled for these days: sent, skipped, or failed. Only a notification that
-        // failed once is attempted again.
-        [$insql, $inparams] = $DB->get_in_or_equal(array_map(fn ($d) => $d->get('id'), $days));
-        $records = [];
-        $fields = 'id, dayid, userid, timesent, attempts';
-        foreach ($DB->get_records_select('local_eventcalendar_sent', "dayid $insql", $inparams, '', $fields) as $row) {
-            $records[$row->dayid . ':' . $row->userid] = $row;
-        }
-
-        // Notifications due for each user, before the more expensive checks.
-        $pending = [];
-        foreach ($subscriptions as $subscription) {
-            $user = $users[$subscription->userid] ?? null;
-            if (!$user) {
-                continue;
+        [$insql, $inparams] = $DB->get_in_or_equal(array_map(fn ($d) => (int) $d->get('id'), $days), SQL_PARAMS_NAMED);
+        $handled = [];
+        $retries = [];
+        $rs = $DB->get_recordset_select(
+            'local_eventcalendar_sent',
+            "dayid $insql",
+            $inparams,
+            '',
+            'id, dayid, userid, timesent, attempts'
+        );
+        foreach ($rs as $row) {
+            $key = $row->dayid . ':' . $row->userid;
+            if ($row->timesent === null && (int) $row->attempts === 1) {
+                $retries[$key] = (int) $row->id;
+            } else {
+                $handled[$key] = true;
             }
+        }
+        $rs->close();
+
+        $rs = $DB->get_recordset_sql(
+            "SELECT s.id, s.userid, s.timesubscribed, u.timezone
+               FROM {local_eventcalendar_subscr} s
+               JOIN {user} u ON u.id = s.userid
+              WHERE s.calendarid = :calendarid AND u.deleted = 0 AND u.suspended = 0",
+            ['calendarid' => $calendarid]
+        );
+        foreach ($rs as $row) {
+            $userid = (int) $row->userid;
+            // The send times need only the time zone of the user.
+            $tzuser = (object) ['id' => $userid, 'timezone' => $row->timezone];
 
             foreach ($days as $day) {
-                $record = $records[$day->get('id') . ':' . $user->id] ?? null;
-                if ($record && ($record->timesent !== null || (int) $record->attempts !== 1)) {
+                $dayid = (int) $day->get('id');
+                $key = $dayid . ':' . $userid;
+                if (isset($handled[$key])) {
                     continue;
                 }
 
-                $sendat = $day->get_local_time(self::SEND_HOUR, $user);
-                $dayend = $day->get_local_day_end($user);
+                $sendat = $day->get_local_time(self::SEND_HOUR, $tzuser);
+                $dayend = $day->get_local_day_end($tzuser);
 
                 // Too early, or the local day is already over.
                 if ($now < $sendat || $now >= $dayend) {
@@ -355,44 +451,23 @@ class notification_dispatcher {
                 }
 
                 // Subscribed after the send time: the notification is skipped.
-                if ((int) $subscription->timesubscribed > $sendat) {
+                if ((int) $row->timesubscribed > $sendat) {
                     continue;
                 }
 
                 // The day id changes every day, so the order of users with the same send time changes too.
-                $pending[] = (object) [
-                    'calendar' => $calendar,
-                    'day' => $day,
-                    'user' => $user,
-                    'sendat' => $sendat,
-                    'order' => crc32($day->get('id') . ':' . $user->id),
-                    'sentid' => $record ? (int) $record->id : 0,
-                    'attempts' => $record ? (int) $record->attempts : 0,
+                $queue[] = [
+                    self::QUEUE_SENDAT => $sendat,
+                    self::QUEUE_ORDER => crc32($key),
+                    self::QUEUE_CALENDARID => $calendarid,
+                    self::QUEUE_DAYID => $dayid,
+                    self::QUEUE_USERID => $userid,
+                    self::QUEUE_SENTID => $retries[$key] ?? 0,
+                    self::QUEUE_ATTEMPTS => isset($retries[$key]) ? 1 : 0,
                 ];
             }
         }
-
-        if (empty($pending)) {
-            return [];
-        }
-
-        // Preload the access rule data of the users with a notification due (one query per rule, not per user).
-        $userids = array_unique(array_map(fn ($item) => (int) $item->user->id, $pending));
-        access_rules::prefetch($calendarid, array_values($userids));
-
-        $allowed = [];
-        $due = [];
-        foreach ($pending as $item) {
-            $userid = (int) $item->user->id;
-            if (!isset($allowed[$userid])) {
-                $allowed[$userid] = $calendar->is_visible($item->user) && access_rules::user_can_access($calendar, $item->user);
-            }
-            if ($allowed[$userid]) {
-                $due[] = $item;
-            }
-        }
-
-        return $due;
+        $rs->close();
     }
 
     /**
@@ -408,9 +483,14 @@ class notification_dispatcher {
      * @return \stdClass|null ->subject, ->plain, ->html; null if there is nothing to say.
      */
     private static function build_content(calendar $calendar, day $day, \stdClass $user, \context $context): ?\stdClass {
+        // The calendar name goes into two kinds of text. The subject is plain text (email subject and Moodle
+        // message subject, escaped by whoever displays it), so it gets the name without HTML escaping; the body
+        // is HTML, so it gets the escaped name. Using the escaped name in the subject would show "&amp;" to
+        // every recipient of a calendar whose name contains "&".
         $name = format_string($calendar->get('name'), true, ['context' => $context]);
+        $plainname = format_string($calendar->get('name'), true, ['context' => $context, 'escape' => false]);
 
-        $title = trim(str_replace('{{name}}', $name, (string) $day->get('notiftitle')));
+        $title = trim(str_replace('{{name}}', $plainname, (string) $day->get('notiftitle')));
         $body = str_replace('{{name}}', $name, (string) $day->get('notifbody'));
 
         $bodyhtml = clean_text($body, (int) $day->get('notifbodyformat'));
@@ -428,7 +508,7 @@ class notification_dispatcher {
         $emailhtml = self::add_file_tokens(email_renderer::render($renderedday, $calendar, $user) ?? $bodyhtml, (int) $user->id);
 
         return (object) [
-            'subject' => $title !== '' ? $title : $name,
+            'subject' => $title !== '' ? $title : $plainname,
             'plain' => $bodyplain,
             'html' => $emailhtml,
         ];
