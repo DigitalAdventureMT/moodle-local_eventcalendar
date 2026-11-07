@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.0
+
+Fixes from the security and code review of 2.0.0.
+
+- New icon set for Lent (lent-1).
+- The day page no longer shows the name of a calendar the user cannot reach. Missing calendars and days get the same "calendar not available" page as hidden or restricted ones, so the pages cannot be used to find which calendars exist.
+- New setting "Maximum calendar length" (default 366 days): days are not generated beyond it.
+- The day content accepts only images also on the server side; the file limits of the editor are applied when saving.
+- For add-ons: `local\draft_files` checks the file types of a draft area on the server, and `calendar_generator::exceeds_max_days()` applies the maximum calendar length.
+- Calendar names with "&" are no longer shown as "&amp;" in the publish dialog and in the notification subject.
+- The structure preview of the email templates is shown in an isolated frame that runs no script, with a height that follows the content.
+- The documentation of the hooks that accept HTML states that the add-ons must escape the data they include.
+- New elements shipped with the plugin (icon sets, email templates, banners, header/footer pairs) are imported at every upgrade, as the documentation states; the new Lent icon set is therefore available after the upgrade.
+- The notification task builds a compact queue and loads the complete user records only in batches, up to the limit of the run: the memory used no longer grows with the size of the user records of all the subscribers.
+- One opening record per user and day, also with concurrent requests: the upgrade removes existing duplicates and makes the index unique.
+
 ## 2.0.0
 
 First public release.

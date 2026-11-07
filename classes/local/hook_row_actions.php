@@ -30,6 +30,12 @@ namespace local_eventcalendar\local;
  * Used by the list hooks. An action is a fragment of HTML already built and escaped by the callback (usually
  * a link). The page shows the actions of each row after its own ones, keeping the delete action last.
  *
+ * Trusted HTML: the HTML added by the callbacks is printed as it is, without any filter, because it comes from
+ * plugin code. The callbacks must escape every value they did not write themselves (names, texts entered by
+ * users, data read from the database or from a request): s() or format_string() for text, format_text() for
+ * rich text, html_writer for tags and attributes. An unescaped value would let whoever controls it inject
+ * markup or scripts into the page of a manager.
+ *
  * @package     local_eventcalendar
  * @copyright   2026 Marco Tosatto <marco.tosatto@digitaladventure.it>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -42,7 +48,7 @@ trait hook_row_actions {
      * Adds an action to the row of an item.
      *
      * @param int $itemid Id of the item shown in the row.
-     * @param string $html HTML of the action, already escaped.
+     * @param string $html HTML of the action, printed as it is: every value not written by the callback must be escaped.
      */
     public function add_row_action(int $itemid, string $html): void {
         $this->rowactions[$itemid][] = $html;

@@ -34,8 +34,13 @@ use local_eventcalendar\persistent\day;
  * action, so the initial HTML is empty. It is not dispatched on weekly rest days, which never have a call to
  * action. In the live preview of the day form, get_overrides() returns the raw values of the submitted form,
  * not yet saved and not cleaned: the callbacks read the fields they added and clean them with clean_param().
- * Otherwise it is empty. The callbacks set the HTML with set_html(), already escaped. They do not return a
- * value.
+ * Otherwise it is empty. The callbacks set the HTML with set_html(). They do not return a value.
+ *
+ * Trusted HTML: the button is printed as it is in the day page, seen by every user of the calendar, and in the
+ * notification emails. The callbacks must escape every value they did not write themselves, above all the
+ * texts and the addresses entered by the managers and the raw values of get_overrides(): s() or
+ * format_string() for text, html_writer for tags and attributes, and a \moodle_url (or clean_param() with
+ * PARAM_URL) for the addresses, so that a javascript: address cannot be used.
  *
  * @package     local_eventcalendar
  * @copyright   2026 Marco Tosatto <marco.tosatto@digitaladventure.it>
@@ -103,7 +108,7 @@ final class day_cta {
     /**
      * Sets the HTML of the button.
      *
-     * @param string $html HTML already escaped, empty for no button.
+     * @param string $html HTML printed as it is (see the class description), empty for no button.
      */
     public function set_html(string $html): void {
         $this->html = $html;

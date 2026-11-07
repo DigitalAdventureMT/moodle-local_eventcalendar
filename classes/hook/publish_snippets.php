@@ -80,11 +80,12 @@ final class publish_snippets {
      *
      * The option has the same structure as those of the plugin:
      *  - key: unique identifier of the option (required);
-     *  - title, description: texts shown in the dialog (required);
-     *  - preview: HTML shown as preview, already escaped (required, it can be empty);
-     *  - code: text to copy (optional);
+     *  - title, description: plain texts shown in the dialog, escaped by the template: do not escape them (required);
+     *  - preview: trusted HTML shown as preview, printed as it is: every value not written by the callback must be
+     *    escaped (required, it can be empty);
+     *  - code: plain text to copy, escaped by the template (optional);
      *  - image: data URI of an image to copy, filename: name used to download it (optional);
-     *  - link: ['url' => ..., 'label' => ...] shown under the option (optional).
+     *  - link: ['url' => ..., 'label' => ...] shown under the option; plain texts, escaped by the template (optional).
      *
      * @param array $snippet The option.
      * @throws \coding_exception If a required key is missing or the key is already used.

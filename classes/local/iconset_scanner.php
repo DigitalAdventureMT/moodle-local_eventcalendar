@@ -40,7 +40,7 @@ use local_eventcalendar\persistent\iconitem;
  * For each set an iconitem row is also created for every image file found, so each icon can be
  * assigned to a specific day.
  *
- * Used by db/install.php (seeding at installation) and by the scan button in iconsets.php.
+ * Used by shipped_elements (at installation and at every upgrade) and by the scan button in iconsets.php.
  *
  * @package     local_eventcalendar
  * @copyright   2026 Marco Tosatto <marco.tosatto@digitaladventure.it>
