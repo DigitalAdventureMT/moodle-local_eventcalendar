@@ -183,7 +183,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="dayid_userid" UNIQUE="false" FIELDS="dayid, userid" COMMENT="Frequent query: does a log exist for this user on this day (icon state)."/>
+        <INDEX NAME="dayid_userid" UNIQUE="true" FIELDS="dayid, userid" COMMENT="One opening record per user and day; also used by the visited state of the days."/>
         <INDEX NAME="calendarid" UNIQUE="false" FIELDS="calendarid" COMMENT="Openings of a calendar (reports)."/>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="Openings of a user (privacy)."/>
       </INDEXES>

@@ -68,6 +68,8 @@ class day_manager {
         // The content editor comes last: the file area itemid is the day id, and the text returned by the
         // draft area save replaces the draft URLs of the images. The form returns the text and the format
         // already split (content, contentformat) plus the draft area in contentitemid.
+        // The editor options are the same used by the form, so the file limits (number, size, folders) are
+        // applied here on the server too; the file types have already been checked by the form validation.
         if (isset($data->content) && isset($data->contentitemid)) {
             $finaltext = file_save_draft_area_files(
                 (int) $data->contentitemid,
@@ -75,7 +77,7 @@ class day_manager {
                 'local_eventcalendar',
                 'content',
                 $day->get('id'),
-                null,
+                \local_eventcalendar\form\day_form::editor_options(),
                 (string) $data->content
             );
             $day->set('content', $finaltext);

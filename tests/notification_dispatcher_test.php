@@ -393,4 +393,30 @@ final class notification_dispatcher_test extends \advanced_testcase {
         $this->assertNull($record->timesent);
         $this->assertEquals(0, $record->attempts);
     }
+
+    /**
+     * The calendar name in the subject is plain text: an ampersand is not turned into "&amp;". The subject falls
+     * back to the name when the day has no title.
+     */
+    public function test_subject_has_plain_calendar_name(): void {
+        $this->calendar->set('name', 'Tom & Jerry');
+        $this->calendar->update();
+        $days = \local_eventcalendar\persistent\day::get_records(['calendarid' => $this->calendar->get('id')]);
+        $day = reset($days);
+        $day->set('notiftitle', 'Today in {{name}}');
+        $day->update();
+        $this->subscribed_user();
+
+        $messages = $this->dispatch($this->today + 9 * HOURSECS);
+
+        $this->assertCount(1, $messages);
+        $this->assertSame('Today in Tom & Jerry', $messages[0]->subject);
+
+        $user = $this->getDataGenerator()->create_user();
+        $day->set('notiftitle', '');
+        $sink = $this->redirectEmails();
+        notification_dispatcher::send_test_email($this->calendar, $day, $user);
+        $this->assertSame('Tom & Jerry', $sink->get_messages()[0]->subject);
+        $sink->close();
+    }
 }

@@ -17,9 +17,11 @@
 /**
  * Grid of the days of a calendar.
  *
- * Access check: calendar::is_visible() and the calendar access rules (classes/local/access_rules.php),
- * both bypassed by users with local/eventcalendar:managecalendars. Users who fail the checks see the
- * generic "calendar not available" message, which does not reveal that the calendar exists.
+ * Access check: the calendar exists, calendar::is_visible() and the calendar access rules
+ * (classes/local/access_rules.php); the last two are bypassed by users who can manage content.
+ * Users who fail any of the checks see the generic "calendar not available" page (access::deny_calendar_view()),
+ * identical for a missing and for an unreachable calendar, so it does not reveal that the calendar exists.
+ * Managers get the explicit "invalid calendar" error instead, which helps them with wrong links.
  *
  * The grid is a standard Bootstrap grid: 4 cards per row on desktop, 2 on tablet, 1 on mobile.
  *
@@ -43,34 +45,34 @@ require_login();
 require_capability('local/eventcalendar:view', context_system::instance());
 
 $calendarid = required_param('id', PARAM_INT);
-
-if (!calendar::record_exists($calendarid)) {
-    throw new moodle_exception('errorinvalidcalendarid', 'local_eventcalendar');
-}
-
-$calendar = new calendar($calendarid);
 $context = context_system::instance();
 
 // Content managers also see hidden calendars and locked days, with the edit and preview links.
 $canmanage = access::can_manage_content();
 
-// Users who can manage calendars bypass the visibility and access rule checks, so they can review
-// hidden or expired calendars. Everyone else is subject to both.
-if (!$canmanage && (!$calendar->is_visible() || !access_rules::user_can_access($calendar, $USER))) {
-    $PAGE->set_url('/local/eventcalendar/view.php', ['id' => $calendarid]);
-    $PAGE->set_context($context);
-    $PAGE->set_pagelayout('standard');
-    $PAGE->set_title(get_string('pluginname', 'local_eventcalendar'));
-
-    echo $OUTPUT->header();
-    echo $OUTPUT->notification(get_string('calendarnotavailable', 'local_eventcalendar'), 'error');
-    echo $OUTPUT->footer();
-    exit;
-}
-
+// The page is set up from the request parameters only, before anything is read from the calendar:
+// the refusal page below needs it and must not depend on the calendar data.
 $PAGE->set_url('/local/eventcalendar/view.php', ['id' => $calendarid]);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
+
+// A missing calendar is refused like an unreachable one, otherwise the error would tell which ids exist.
+// Managers can see every existing calendar anyway, so for them the explicit error is kept.
+$calendar = calendar::get_record(['id' => $calendarid]);
+if (!$calendar) {
+    if (!$canmanage) {
+        access::deny_calendar_view();
+    }
+    throw new moodle_exception('errorinvalidcalendarid', 'local_eventcalendar');
+}
+
+// Users who can manage content bypass the visibility and access rule checks, so they can review
+// hidden or expired calendars. Everyone else is subject to both.
+if (!$canmanage && (!$calendar->is_visible() || !access_rules::user_can_access($calendar, $USER))) {
+    access::deny_calendar_view();
+}
+
+// Only from here on the page shows data of the calendar.
 $PAGE->set_title(format_string($calendar->get('name')));
 $PAGE->set_heading(format_string($calendar->get('name')));
 

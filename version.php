@@ -27,8 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_eventcalendar';
 // The version grows with every release. A release that changes the database schema also adds the matching
 // step, with its savepoint, to db/upgrade.php.
-$plugin->version   = 2026110400;
+$plugin->version   = 2026110600;
 $plugin->requires  = 2024100700; // Moodle 4.5.
 $plugin->supported = [405, 503]; // Moodle 4.5 to 5.3.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.0.0';
+$plugin->release   = '2.1.0';

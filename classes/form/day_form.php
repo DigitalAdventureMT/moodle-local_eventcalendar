@@ -154,7 +154,7 @@ class day_form extends \core\form\persistent {
             'local_eventcalendar',
             'content',
             $day->get('id'),
-            null,
+            self::editor_options(),
             $day->get('content')
         );
 
@@ -185,6 +185,16 @@ class day_form extends \core\form\persistent {
      * @return array
      */
     protected function extra_validation($data, $files, array &$errors) {
+        // Files of the content editor: only the accepted types (images). The check is done on the draft area,
+        // before anything is moved to the file area of the day.
+        $fileerror = \local_eventcalendar\local\draft_files::get_error(
+            (int) ($data->contentitemid ?? 0),
+            self::editor_options()['accepted_types']
+        );
+        if ($fileerror !== null) {
+            $errors['content'] = $fileerror;
+        }
+
         // Title and body must come from the pools of the notification set, or be the values already saved: the
         // fields are read only, but a request can be made by hand. The saved values are read from the database,
         // because the persistent form has already loaded the submitted values into its own copy of the day.
@@ -218,6 +228,34 @@ class day_form extends \core\form\persistent {
      */
     private static function normalise_text(string $text): string {
         return trim(str_replace(["\r\n", "\r"], "\n", $text));
+    }
+
+    /**
+     * Options of the day content editor, shared by the form element, the draft area preparation and the save.
+     *
+     * Using the same array in the three places makes the server apply the limits declared to the browser.
+     * Note that file_save_draft_area_files() applies only maxfiles, maxbytes, areamaxbytes and subdirs:
+     * accepted_types is read by the file picker only, which is why the types are also checked in
+     * extra_validation() through draft_files::find_not_accepted().
+     *
+     * - maxfiles -1: any number of images in the content;
+     * - maxbytes: the site upload limit (files over the limit are not saved);
+     * - subdirs false: the editor does not create folders, and files in folders are not saved;
+     * - noclean true: the content is written by content managers, whose capabilities carry RISK_XSS.
+     *
+     * @return array
+     */
+    public static function editor_options(): array {
+        global $CFG;
+
+        return [
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'maxbytes' => get_max_upload_file_size($CFG->maxbytes),
+            'subdirs' => false,
+            'accepted_types' => ['web_image'],
+            'noclean' => true,
+            'context' => \context_system::instance(),
+        ];
     }
 
     /**
@@ -366,14 +404,17 @@ class day_form extends \core\form\persistent {
         ]);
 
         // Column 3: day content.
-        // Only images can be added: the file picker applies the list on the client side only, so the
-        // pluginfile callback also sends any other type as a download (see pluginfile_access).
-        $mform->addElement('editor', 'content', get_string('daycontent', 'local_eventcalendar'), null, [
-            'maxfiles' => -1,
-            'accepted_types' => ['web_image'],
-            'noclean' => true,
-            'context' => \context_system::instance(),
-        ]);
+        // Only images can be added. The file picker applies the list in the browser only, so the types are
+        // checked again on the server in extra_validation(), and the pluginfile callback sends any other type
+        // as a download anyway (see pluginfile_access). The options are shared with the draft area preparation
+        // and with the save, see editor_options().
+        $mform->addElement(
+            'editor',
+            'content',
+            get_string('daycontent', 'local_eventcalendar'),
+            null,
+            self::editor_options()
+        );
 
         if (!empty($contentpool)) {
             $this->add_pack_choice_select(

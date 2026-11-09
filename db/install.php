@@ -98,47 +98,11 @@ function xmldb_local_eventcalendar_install() {
         }
     }
 
-    // Seed the standard iconsets found in pix/iconsets/. An error (for example a malformed iconset.json)
-    // must not make the installation fail; it is only reported, and the rescan button in iconsets.php
-    // remains available.
-    try {
-        \local_eventcalendar\local\iconset_scanner::scan();
-    } catch (\Throwable $e) {
-        debugging(
-            'Automatic scan of standard icon sets failed: ' . $e->getMessage(),
-            DEBUG_DEVELOPER
-        );
-    }
-
-    // Seed the email templates found in email_templates/, with the same error handling as the iconsets.
-    try {
-        \local_eventcalendar\local\email_template_scanner::scan();
-    } catch (\Throwable $e) {
-        debugging(
-            'Automatic scan of email templates failed: ' . $e->getMessage(),
-            DEBUG_DEVELOPER
-        );
-    }
-
-    // Seed the banners found in pix/banners/, with the same error handling as the iconsets.
-    try {
-        \local_eventcalendar\local\banner_scanner::scan();
-    } catch (\Throwable $e) {
-        debugging(
-            'Automatic scan of preloaded banners failed: ' . $e->getMessage(),
-            DEBUG_DEVELOPER
-        );
-    }
-
-    // Seed the header/footer pairs found in pix/headerfooters/, with the same error handling as the iconsets.
-    try {
-        \local_eventcalendar\local\headerfooter_scanner::scan();
-    } catch (\Throwable $e) {
-        debugging(
-            'Automatic scan of header/footer pairs failed: ' . $e->getMessage(),
-            DEBUG_DEVELOPER
-        );
-    }
+    // Import the elements shipped with the plugin: icon sets, email templates, banners and header/footer
+    // pairs. The same import runs at every upgrade (db/upgrade.php). An error of a scan does not make the
+    // installation fail; it is only reported, and the detection buttons of the management pages remain
+    // available.
+    \local_eventcalendar\local\shipped_elements::import();
 
     // Seed the dates of the lookup_table templates. Like the scans above, this is not critical: without the
     // rows the calendar form simply does not propose default dates for the template.
