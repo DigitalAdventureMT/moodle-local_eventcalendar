@@ -91,10 +91,14 @@ Feature: Accessibility of the event calendar pages
     And the page should meet accessibility standards
 
   Scenario: The email template form meets the accessibility standards
+    # The structure preview is a frame sandboxed without scripts, where the accessibility check cannot run:
+    # the scenario checks that the frame has an accessible name, then removes it and checks the rest of the page.
     Given I log in as "admin"
     When I visit "/local/eventcalendar/email_templates.php"
     And I click on "Edit" "link" in the "region-main" "region"
-    Then the page should meet accessibility standards
+    Then "//iframe[@data-region='local-eventcalendar-emailpreview'][normalize-space(@title) != '']" "xpath_element" should exist
+    And I remove the preview frames from the page
+    And the page should meet accessibility standards
 
   Scenario: The preview window of a day shows the content and the email
     # The preview frame is sandboxed without scripts, because it shows HTML of the editors and of the email

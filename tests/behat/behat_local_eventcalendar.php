@@ -81,6 +81,24 @@ class behat_local_eventcalendar extends behat_base {
     }
 
     /**
+     * Removes the sandboxed preview frames of the plugin from the page, before an accessibility check.
+     *
+     * The preview frames show HTML of the email templates and of the days in a sandbox without scripts, so
+     * the accessibility check of Moodle (axe) cannot run inside them: axe waits for an answer from each frame,
+     * and the check of the page runs out of time before the frames answer ("No data"). The frame is removed
+     * only after the scenario has checked that it is present and has an accessible name (title attribute),
+     * so that the check covers the rest of the page, which is what the plugin controls. The content of the
+     * frame is a template or a day content, checked on the pages where it is shown.
+     *
+     * @When I remove the preview frames from the page
+     */
+    public function i_remove_the_preview_frames_from_the_page(): void {
+        $this->execute_script(
+            "document.querySelectorAll('iframe[data-region^=\"local-eventcalendar-\"]').forEach((frame) => frame.remove());"
+        );
+    }
+
+    /**
      * Returns the id of a calendar from its name.
      *
      * @param string $name calendar name
